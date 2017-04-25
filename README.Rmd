@@ -45,3 +45,16 @@ emo::ji("face")
 ```
 
 Often you'll use inline like `r '\u60r emo::ji("smile")\u60'`
+
+## Keywords
+
+These are all keywords with more than one emoji associated with them.
+
+```{r, echo = FALSE}
+keywords <- emo:::emoji_keyword
+keywords <- keywords[lengths(keywords) > 1]
+
+emojis <- purrr::map_chr(keywords, function(x) paste0(emo:::emoji_name[x], collapse = ""))
+
+cat(paste(names(emojis), ": ", emojis, collapse = "\n"))
+```
