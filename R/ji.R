@@ -27,3 +27,25 @@ find_emoji <- function(keyword) {
 
   stop("Couldn't find emoji '", keyword, "'")
 }
+
+
+#' List all emoji with a given keyword
+#'
+#' Note that this is unlikely to print correctly on your R console, but
+#' it will work in (e.g.) the RStudio viewer.
+#'
+#' @param keyword Emoji keyword
+#' @export
+#' @examples
+#' emo::ji_find("happy")
+ji_find <- function(keyword) {
+  names <- emoji_keyword[[keyword]]
+  if (length(names) == 0) {
+    stop("Couldn't find any emoji with '", keyword, "'")
+  }
+
+  tibble::tibble(
+    name = names,
+    emoji = unname(emoji_name[names])
+  )
+}
