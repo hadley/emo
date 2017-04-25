@@ -7,7 +7,9 @@
 #' emo::ji("banana")
 #' emo::ji("monkey")
 ji <- function(keyword) {
-  knitr::asis_output(find_emoji(keyword))
+  res <- knitr::asis_output(find_emoji(keyword))
+  class(res) <- c("emoji", class(res))
+  res
 }
 
 find_emoji <- function(keyword) {
@@ -48,4 +50,9 @@ ji_find <- function(keyword) {
     name = names,
     emoji = unname(emoji_name[names])
   )
+}
+
+#' @export
+print.emoji <- function(x, ...) {
+  cat(x, "\n")
 }
