@@ -1,12 +1,13 @@
 Package: emo
-Title: What the Package Does (one line, title case)
+Title: Easily Insert 'Emoji'
 Version: 0.0.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("RStudio", role = "cph")
   )
-Description: What the package does (one paragraph).
-Depends: R (>= 3.3.2)
+Description: Makes it easy to insert 'emoji' based on either their name
+    or a descriptive keyword.
+Depends: R (>= 2.10)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -14,3 +15,5 @@ Suggests: rmarkdown
 VignetteBuilder: knitr
 Imports: knitr
 RoxygenNote: 6.0.1
+URL: https://github.com/hadley/emo
+BugReports: https://github.com/hadley/emo/issues
