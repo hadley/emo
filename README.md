@@ -14,7 +14,7 @@ You can install emo from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("emo/hadley")
+devtools::install_github("hadley/emo")
 ```
 
 Example
