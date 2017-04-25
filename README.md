@@ -5,6 +5,8 @@ emo(ji)
 
 The goal of emo(ji) is to make it very easy to insert emoji into RMarkdown documents.
 
+Emoji data from <https://github.com/muan/emojilib/>.
+
 Installation
 ------------
 

@@ -17,6 +17,8 @@ set.seed(1014)
 
 The goal of emo(ji) is to make it very easy to insert emoji into RMarkdown documents.
 
+Emoji data from <https://github.com/muan/emojilib/>.
+
 ## Installation
 
 You can install emo from github with:
@@ -30,7 +32,7 @@ devtools::install_github("emo/hadley")
 
 You can either refer to emoji by their name (which is unique):
 
-```{r}µ
+```{r}
 emo::ji("poop")
 ```
 
