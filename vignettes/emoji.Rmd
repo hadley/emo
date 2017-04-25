@@ -1,0 +1,18 @@
+---
+title: "Emo(ji)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+It's currently hard to insert to emoji into RMarkdown documents. The emo(ji) package makes it very easy: `r emo::ji("smile")`
+
+```{r}
+emo::ji("smile")
+emo::ji("moon")
+```
+
+You can either supply a name (unique) or a keyword (not unique). If you supply a keyword, emo::ji will will randomly pick from the options.
+
