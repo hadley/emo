@@ -20,7 +20,9 @@ find_emoji <- function(keyword) {
 
   if (keyword %in% names(emoji_keyword)) {
     candidates <- emoji_keyword[[keyword]]
-    return(sample(candidates, 1))
+    name <- sample(candidates, 1)
+
+    return(emoji_name[[name]])
   }
 
   stop("Couldn't find emoji '", keyword, "'")
