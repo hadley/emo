@@ -7,9 +7,10 @@
 #' emo::ji("banana")
 #' emo::ji("monkey")
 ji <- function(keyword) {
-  res <- knitr::asis_output(find_emoji(keyword))
-  class(res) <- c("emoji", class(res))
-  res
+  structure(
+    find_emoji(keyword),
+    class = "emoji"
+  )
 }
 
 find_emoji <- function(keyword) {

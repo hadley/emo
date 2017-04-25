@@ -44,7 +44,7 @@ emo::ji("face")
 emo::ji("face")
 ```
 
-Often you'll use inline like `r '\u60r emo::ji("smile")\u60'`
+Often you'll use inline like `r '\u60\u60 \u60r emo::ji("smile")\u60 \u60\u60'` `r emo::ji("smile")`
 
 ## Keywords
 

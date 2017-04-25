@@ -24,31 +24,21 @@ You can either refer to emoji by their name (which is unique):
 
 ``` r
 emo::ji("poop")
+#> 💩
 ```
-
-💩
 
 Or by a keyword. Keywords are not unique so emo::ji will pick one for you at random.
 
 ``` r
 emo::ji("face")
-```
-
-😄
-
-``` r
+#> 😄
 emo::ji("face")
-```
-
-😲
-
-``` r
+#> 😲
 emo::ji("face")
+#> 😣
 ```
 
-😣
-
-Often you'll use inline like `r emo::ji("smile")`
+Often you'll use inline like `` `r emo::ji("smile")` `` 😄
 
 Keywords
 --------
