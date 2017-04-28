@@ -3,3 +3,4 @@
 S3method(print,emoji)
 export(ji)
 export(ji_find)
+export(ji_p)
