@@ -25,6 +25,8 @@ invert <- function(x) {
 
 emoji_keyword <- invert(keywords)
 
+emoji_keyword[names(emoji_name)] <- map2(emoji_keyword[names(emoji_name)], names(emoji_name), union)
+
 devtools::use_data(
   emoji_name,
   emoji_keyword,

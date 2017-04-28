@@ -20,6 +20,8 @@ devtools::install_github("hadley/emo")
 Example
 -------
 
+*💩*
+
 You can either refer to emoji by their name (which is unique):
 
 ``` r
