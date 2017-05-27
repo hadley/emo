@@ -38,11 +38,22 @@ find_emoji <- function(keyword) {
 #' it will work in (e.g.) the RStudio viewer.
 #'
 #' @param keyword Emoji keyword
+#' @param regex If \code{TRUE} then \code{keyword} is treated as a regular expression.
 #' @export
 #' @examples
 #' emo::ji_find("happy")
-ji_find <- function(keyword) {
-  names <- emoji_keyword[[keyword]]
+#' emo::ji_find("^env", regex = TRUE)
+ji_find <- function(keyword, regex = FALSE) {
+  if (regex) {
+    keyword_matches <- names(emoji_keyword)[grep(keyword, names(emoji_keyword))]
+    names <- sapply(keyword_matches, function(word){
+      emoji_keyword[[word]]
+    })
+    names <- unique(unlist(names, use.names = FALSE))
+  } else {
+    names <- emoji_keyword[[keyword]]
+  }
+
   if (length(names) == 0) {
     stop("Couldn't find any emoji with '", keyword, "'")
   }
