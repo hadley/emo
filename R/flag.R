@@ -36,13 +36,17 @@ flag <- function( pattern ){
   structure( data$emoji, name = data$name, data = data, class = c("flag", "emoji") )
 }
 
+
 #' @importFrom crayon silver
+cat_discreet <- function(...){
+  cat( silver( paste0(...) ) )
+}
+
 #' @export
 print.flag <- function(x, ... ){
-  # discreet <- make_style( "#E4E4E4", grey = TRUE )
   discreet <- silver
   NextMethod()
-  cat( discreet( paste0( "<flag for '", attr(x, "name"), "'>\n"  ) ) )
+  cat_discreet("<flag for '", attr(x, "name"), "'>\n")
   invisible(x)
 }
 
