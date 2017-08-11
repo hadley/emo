@@ -13,6 +13,7 @@
 - keywords: vector of keywords
 - skin_tone: when applicable the skin tone, otherwise NA
 - runes: vector of unicode runes, i.e. hexadecimal representations prefixed with "U+"
+- nrunes: number of runes the emoji uses
 - apple ... windows: logical indicating if the given vendor supports the emoji}
 \source{
 [Unicode® Emoji Charts v5.0](http://unicode.org/emoji/charts/index.html)

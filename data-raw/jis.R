@@ -38,6 +38,7 @@ parse_emoji_list <- function(
         map( ~ strtoi(., base = 16) ) %>%
         stri_enc_fromutf32(),
       runes = str_split( runes, " "),
+      nrunes = map_int( runes, length),
       name = str_replace( name, "⊛ ", ""),
       skin_tone = case_when(
         str_detect(name, ":.*skin tone$") ~ str_replace_all(name, "^.*:(.*)skin tone", "\\1"),
@@ -45,7 +46,7 @@ parse_emoji_list <- function(
       )
     ) %>%
     as_tibble() %>%
-    select( id, emoji, name, category, subcategory, keywords, skin_tone, runes )
+    select( id, emoji, name, category, subcategory, keywords, skin_tone, runes, nrunes )
 
   # but then the other file can be used to identify vendor coverage
   table <- read_html(full_emoji_list) %>% html_node("table")
