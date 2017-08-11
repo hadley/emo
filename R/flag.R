@@ -24,7 +24,7 @@
 #' @importFrom glue glue
 #' @export
 flag <- function( pattern ){
-  data <- filter( jis, category == "Flags", str_detect(name, pattern) )
+  data <- filter( emo::jis, category == "Flags", str_detect(name, pattern) )
   n <- nrow(data)
   if( n == 0 ){
     stop( glue( "Cannot find flag '{pattern}' ") )
@@ -45,4 +45,7 @@ print.flag <- function(x, ... ){
   cat( discreet( paste0( "<flag for '", attr(x, "name"), "'>\n"  ) ) )
   invisible(x)
 }
+
+#' @importFrom utils globalVariables
+globalVariables( c("category", "name") )
 

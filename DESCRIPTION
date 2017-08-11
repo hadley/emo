@@ -17,7 +17,8 @@ Imports:
     stringr,
     dplyr,
     glue,
-    crayon
+    crayon,
+    utils
 RoxygenNote: 6.0.1.9000
 URL: https://github.com/hadley/emo
 BugReports: https://github.com/hadley/emo/issues
