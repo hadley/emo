@@ -13,7 +13,11 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    tibble
+    tibble,
+    stringr,
+    dplyr,
+    glue,
+    crayon
 RoxygenNote: 6.0.1.9000
 URL: https://github.com/hadley/emo
 BugReports: https://github.com/hadley/emo/issues
