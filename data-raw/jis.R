@@ -37,7 +37,7 @@ parse_emoji_list <- function(
         str_split( " ") %>%
         map( ~ strtoi(., base = 16) ) %>%
         stri_enc_fromutf32(),
-      runes = str_split( runes, " [|] "),
+      runes = str_split( runes, " "),
       name = str_replace( name, "⊛ ", ""),
       skin_tone = case_when(
         str_detect(name, ":.*skin tone$") ~ str_replace_all(name, "^.*:(.*)skin tone", "\\1"),
