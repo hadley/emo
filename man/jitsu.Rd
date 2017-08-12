@@ -30,6 +30,8 @@ extract an emoji
 `ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter] on [jis]
 
 `jitsu` selects one match at random between the results of `ji_filter`
+
+`ji_set` pastes all the emojis together in a single string
 }
 \examples{
 \dontrun{

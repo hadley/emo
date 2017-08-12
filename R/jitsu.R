@@ -74,7 +74,7 @@ ji_filter <- function( ... ){
 #'
 #' `jitsu` selects one match at random between the results of `ji_filter`
 #'
-#' `ji_set` pastes all the emojis together in a single string
+#' `ji_set` makes a vector of all the selected emojis
 #'
 #' @examples
 #' \dontrun{
@@ -117,7 +117,7 @@ jitsu <- function( ... ){
 #' @export
 ji_set <- function(...){
   structure(
-    paste( ji_filter(...)$emoji ),
+    c( ji_filter(...)$emoji ),
     class = "emoji"
   )
 }
