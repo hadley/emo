@@ -2,7 +2,7 @@
 #' @importFrom purrr map_chr map2_chr
 #' @export
 ji_glue_one <- function(txt){
-  rx <- ":[^:]+:[*]?"
+  rx <- ":[^:]*:[*]?"
   pos <- str_locate_all(txt, rx)[[1]]
 
   chunks <- str_extract_all(txt, rx)[[1]]
@@ -11,10 +11,16 @@ ji_glue_one <- function(txt){
 
   emojis <- map2_chr(
     chunks, list, ~{
-      if(.y){
-        paste( eval( parse( text = paste0( "ji_set(", .x, ")" ) ) ), collapse = " " )
+      if(identical(.x, "")){
+        "::"
       } else {
-        eval( parse( text = paste0( "jitsu(", .x, ")" ) ) )
+        tryCatch({
+          if(.y){
+            paste( eval( parse( text = paste0( "ji_set(", .x, ")" ) ) ), collapse = " " )
+          } else {
+            eval( parse( text = paste0( "jitsu(", .x, ")" ) ) )
+          }
+        }, error = function(e) .x)
       }
     }
   )
