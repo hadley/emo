@@ -41,7 +41,7 @@ parse_emoji_list <- function(
       nrunes = map_int( runes, length),
       name = str_replace( name, "⊛ ", ""),
       skin_tone = case_when(
-        str_detect(name, ":.*skin tone$") ~ str_replace_all(name, "^.*:(.*)skin tone", "\\1"),
+        str_detect(name, ":.*skin tone$") ~ str_trim(str_replace_all(name, "^.*:(.*)skin tone", "\\1")),
         TRUE                              ~ NA_character_
       )
     ) %>%
