@@ -1,7 +1,8 @@
 
 #' @importFrom purrr map_lgl
 #' @importFrom stringr str_detect
-#' @importFrom rlang quo quo_name enquo
+#' @importFrom rlang quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang
+#'
 jitsu_simple_detect <- function(col, s){
   col <- enquo(col)
   s <- enquo(s)
