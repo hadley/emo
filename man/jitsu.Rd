@@ -3,11 +3,14 @@
 \name{ji_filter}
 \alias{ji_filter}
 \alias{jitsu}
+\alias{ji_set}
 \title{extract an emoji}
 \usage{
 ji_filter(...)
 
 jitsu(...)
+
+ji_set(...)
 }
 \arguments{
 \item{`...`}{set of filters, see details}

@@ -1,7 +1,7 @@
 
 #' @importFrom purrr map_lgl
 #' @importFrom stringr str_detect
-#' @importFrom rlang quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang
+#' @importFrom rlang quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang expr_name
 #'
 jitsu_simple_detect <- function(col, s){
   col <- enquo(col)
@@ -74,6 +74,8 @@ ji_filter <- function( ... ){
 #'
 #' `jitsu` selects one match at random between the results of `ji_filter`
 #'
+#' `ji_set` pastes all the emojis together in a single string
+#'
 #' @examples
 #' \dontrun{
 #'
@@ -106,9 +108,20 @@ jitsu <- function( ... ){
   structure( data$emoji,
     data = data,
     results = results,
+    call = match.call(),
     class = c("jitsu", "emoji")
   )
 }
+
+#' @rdname jitsu
+#' @export
+ji_set <- function(...){
+  structure(
+    paste( ji_filter(...)$emoji ),
+    class = "emoji"
+  )
+}
+
 
 #' @export
 print.jitsu <- function(x, ...){
@@ -119,3 +132,5 @@ print.jitsu <- function(x, ...){
   ))
   invisible(x)
 }
+
+globalVariables( c("category", "keywords", "subcategory", "runes", "skin_tone") )
