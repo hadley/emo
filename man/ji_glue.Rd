@@ -8,16 +8,22 @@ ji_glue(txt)
 }
 \arguments{
 \item{txt}{character vector in which to replace `:something:` by an
-emoji for `something`}
+emoji for `something`, or `:something:*` by the collapsed
+list of all emojis relevant to `something`.}
 }
 \description{
 emoji replacement
 }
 \details{
-[jitsu] is used on each pattern wrapped in `:`
+- For the single form `:something:` [jitsu] is used on each pattern wrapped in `:`
+- For the list form `:something:*` [ji_set] is used
 }
 \examples{
 \dontrun{
   ji_glue( "My :cat,face,love: loves to :sleep,zzz:" )
+
+  ji_glue( ":monkey:* loves to :dance:" )
+
+  ji_glue( ":technologist:* do :cool: stuff")
 }
 }
