@@ -1,0 +1,3 @@
+[submodule "data-raw/gemoji"]
+	path = data-raw/gemoji
+	url = https://github.com/github/gemoji.git
