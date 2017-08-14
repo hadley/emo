@@ -97,4 +97,19 @@ jis <- jis %>%
   mutate( keywords = map2(keywords, tags, ~unique( c(.x, .y))) ) %>%
   select( -tags )
 
+alias_from_name <- function(name){
+  name %>%
+    str_replace_all( "[Åã]", "a" ) %>%
+    str_replace_all( "ç", "c" ) %>%
+    str_replace_all( "é", "e" ) %>%
+    str_replace_all( "í", "i") %>%
+    str_replace_all( "ô", "o") %>%
+    str_replace_all( "[^0-9a-zA-Z]", "_" ) %>%
+    str_replace_all( "_+", "_")
+}
+
+jis <- jis %>%
+  mutate( aliases = map2( alias_from_name(name), aliases, ~unique( c(.x, .y))) )%>%
+  select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, apple:windows )
+
 use_data( jis, overwrite = TRUE)
