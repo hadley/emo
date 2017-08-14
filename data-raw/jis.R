@@ -113,3 +113,11 @@ jis <- jis %>%
   select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, apple:windows )
 
 use_data( jis, overwrite = TRUE)
+
+aliases <- jis %>%
+  select( emoji, aliases) %>%
+  unnest
+
+ji_alias <- set_names(aliases$emoji, aliases$aliases )
+use_data( ji_alias, overwrite = TRUE)
+

@@ -14,3 +14,6 @@
 #' - nrunes: number of runes the emoji uses
 #' - apple ... windows: logical indicating if the given vendor supports the emoji
 "jis"
+
+#' emoji aliases
+"ji_alias"
