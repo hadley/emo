@@ -1,6 +1,5 @@
 #' @importFrom stringr str_sub<- str_replace_all str_extract_all str_locate_all
 #' @importFrom purrr map_chr map2_chr
-#' @export
 ji_glue_one <- function(txt){
   rx <- ":[^:]*:[*]?"
   pos <- str_locate_all(txt, rx)[[1]]
@@ -57,3 +56,34 @@ ji_glue <- function(txt){
     class = "emoji"
   )
 }
+
+ji_replace_one <- function(txt){
+  rx <- ":([a-zA-Z0-9_]*):"
+  pos <- str_locate_all(txt, rx)[[1]]
+
+  chunks <- str_extract_all(txt, rx)[[1]]
+
+  emojis <- map_chr(
+    chunks, ~{
+      name <- str_replace(., rx, "\\1")
+      if( name %in% names(emo::ji_alias) ) emo::ji_alias[name]
+    }
+  )
+
+  for( i in rev(seq_along(emojis)) ){
+    str_sub(txt, pos[i,1], pos[i,2]) <- emojis[i]
+  }
+
+  txt
+}
+
+
+#' @export
+ji_replace <- function(txt){
+  structure(
+    map_chr(txt, ji_replace_one),
+    class = "emoji"
+  )
+}
+
+
