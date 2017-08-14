@@ -16,9 +16,16 @@ ji_fisher <- function(x) {
 }
 
 get_emoji <- function(x) {
-  emojis <- fisher_lst[[tolower(x)]]
+  emojis <- emo::fisher_lst[[tolower(x)]]
   if (length(emojis) == 0L) {
     return(x)
   }
   sample(emojis, 1)
 }
+
+#' Letter to emoji list
+#'
+#'
+#' @format List
+"fisher_lst"
+
