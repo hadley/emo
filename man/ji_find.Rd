@@ -4,10 +4,12 @@
 \alias{ji_find}
 \title{List all emoji with a given keyword}
 \usage{
-ji_find(keyword)
+ji_find(keyword, regex = FALSE)
 }
 \arguments{
 \item{keyword}{Emoji keyword}
+
+\item{regex}{If \code{TRUE} then \code{keyword} is treated as a regular expression.}
 }
 \description{
 Note that this is unlikely to print correctly on your R console, but
@@ -15,4 +17,5 @@ it will work in (e.g.) the RStudio viewer.
 }
 \examples{
 emo::ji_find("happy")
+emo::ji_find("^env", regex = TRUE)
 }

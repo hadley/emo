@@ -1,6 +1,6 @@
 Package: emo
 Title: Easily Insert 'Emoji'
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Romain", "François", , "romain@thinkr.fr", role = c("aut")), 
