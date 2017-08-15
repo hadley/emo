@@ -171,6 +171,11 @@ kw <- select( jis, keywords, aliases ) %>%
   group_by( keywords ) %>%
   summarise( name = list(c(aliases)) )
 
+aliases <- unique( flatten_chr(jis$aliases) )
+aliases <- aliases[ !aliases %in% kw$keywords ]
+
+kw <- bind_rows( kw, tibble(keywords = aliases, name = as.list(aliases) ) )
+
 ji_keyword <- set_names( kw$name, kw$keywords )
 use_data( ji_keyword, overwrite = TRUE)
 
