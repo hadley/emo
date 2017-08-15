@@ -129,7 +129,7 @@ emojilib_tbl <- tibble(
   filter( ! emojilibname %in% all_alias )
 
 jis <- left_join( jis, emojilib_tbl, by = "emoji" ) %>%
-  mutate( aliases = map2(aliases, emojilibname, ~c(.x, .y) ) ) %>%
+  mutate( aliases = map2(aliases, emojilibname, ~{ res <- c(.x, .y); res[!is.na(res)] } ) ) %>%
   select(-emojilibname)
 
 use_data( jis, overwrite = TRUE)
