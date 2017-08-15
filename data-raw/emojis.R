@@ -3,10 +3,7 @@ library(jsonlite)
 
 # Download & import -------------------------------------------------------
 
-url <- "https://github.com/muan/emojilib/raw/master/emojis.json"
-download.file(url, "data-raw/emojis.json", quiet = TRUE)
-
-emoji <- read_json("data-raw/emojis.json")
+emoji <- read_json("data-raw/emojilib/emojis.json")
 View(emoji)
 
 # Extract names and keywords ----------------------------------------------
