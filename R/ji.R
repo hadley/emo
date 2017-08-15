@@ -42,7 +42,7 @@ find_emoji <- function(keyword) {
 #' @examples
 #' emo::ji_find("happy")
 ji_find <- function(keyword) {
-  names <- emoji_keyword[[keyword]]
+  names <- emo::ji_keyword[[keyword]]
   if (length(names) == 0) {
     stop("Couldn't find any emoji with '", keyword, "'")
   }
