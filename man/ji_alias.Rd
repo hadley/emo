@@ -4,7 +4,7 @@
 \name{ji_alias}
 \alias{ji_alias}
 \title{emoji aliases}
-\format{An object of class \code{character} of length 3357.}
+\format{An object of class \code{character} of length 5960.}
 \usage{
 ji_alias
 }

@@ -117,6 +117,21 @@ jis <- left_join( jis_, gemoji, by = "emoji" ) %>%
   mutate( aliases = merge_names( alias_from_name(name), aliases ) ) %>%
   select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, starts_with("vendor") )
 
+# get extra names from emojilib
+all_alias <- flatten_chr(jis$aliases)
+emojilib <- read_json("data-raw/emojilib/emojis.json")
+keep <- emojilib %>% map( "char" ) %>% map_lgl(negate(is.null))
+emojilib <- emojilib[keep]
+emojilib_tbl <- tibble(
+  emojilibname = names(emojilib),
+  emoji = emojilib %>% map_chr( "char" )
+  ) %>%
+  filter( ! emojilibname %in% all_alias )
+
+jis <- left_join( jis, emojilib_tbl, by = "emoji" ) %>%
+  mutate( aliases = map2(aliases, emojilibname, ~c(.x, .y) ) ) %>%
+  select(-emojilibname)
+
 use_data( jis, overwrite = TRUE)
 
 aliases <- jis %>%
