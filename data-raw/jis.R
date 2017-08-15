@@ -156,6 +156,6 @@ aliases <- jis %>%
   select( emoji, aliases) %>%
   unnest
 
-ji_alias <- set_names(aliases$emoji, aliases$aliases )
-use_data( ji_alias, overwrite = TRUE)
+ji_name <- set_names(aliases$emoji, aliases$aliases )
+use_data( ji_name, overwrite = TRUE)
 

@@ -16,4 +16,4 @@
 "jis"
 
 #' emoji aliases
-"ji_alias"
+"ji_name"
