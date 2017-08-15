@@ -29,3 +29,10 @@ get_emoji <- function(x) {
 #' @format List
 "fisher_lst"
 
+#' @export
+print.fisher_alphabet <- function(x, ...){
+  letters <- names(x)
+  emojis  <- map_chr( x, paste, collapse = " ")
+  writeLines( paste( letters, "  :  ", emojis) )
+  invisible(x)
+}

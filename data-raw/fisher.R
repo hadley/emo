@@ -30,6 +30,6 @@ fisher_tbl <- tibble::tribble(
   "?", c("❓", "❔")
 )
 
-fisher_lst <- tibble::deframe(fisher_tbl)
+fisher_lst <- structure( tibble::deframe(fisher_tbl), class = "fisher_alphabet" )
 
 devtools::use_data(fisher_lst, overwrite = TRUE)

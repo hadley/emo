@@ -3,6 +3,7 @@
 S3method(print,clock)
 S3method(print,diamond)
 S3method(print,emoji)
+S3method(print,fisher_alphabet)
 S3method(print,flag)
 S3method(print,jitsu)
 S3method(print,keycap)
