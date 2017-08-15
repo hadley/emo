@@ -2,7 +2,6 @@
 #' @importFrom purrr map_lgl
 #' @importFrom stringr str_detect
 #' @importFrom rlang quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang expr_name
-#'
 jitsu_simple_detect <- function(col, s){
   col <- enquo(col)
   s <- enquo(s)
@@ -18,7 +17,9 @@ jitsu_multi_detect <- function(col, s){
 jitsu_large_detect <- function(s){
   s <- enquo(s)
   quo(
-    str_detect( name, !!quo_name(s) ) | map_lgl( keywords, ~ any(str_detect( ., !!quo_name(s))) )
+    str_detect( name, !!quo_name(s) ) |
+    map_lgl( keywords, ~ any(str_detect( ., !!quo_name(s))) ) |
+    map_lgl( aliases , ~ any(str_detect( ., !!quo_name(s))) )
   )
 }
 
@@ -38,8 +39,6 @@ jitsu_filter_exprs <- function( q ){
 
       "keyword"     = jitsu_multi_detect( keywords, !!expr[[2]]),
       "runes"       = jitsu_multi_detect( runes, !!expr[[2]]),
-
-      "vendor"      = quo(!!expr[[2]]),
 
       q
     )
@@ -66,8 +65,6 @@ ji_filter <- function( ... ){
 #' - bare symbols or strings, to be looked for in the name or the keywords. Understood as regular expressions.
 #' - calls to the pseudo-functions `name`, `category`, `subcategory`, `skin_tone`, `keyword`, `runes`. These accept regular expressions
 #'   to match the relevant column, e.g. `name("^cat")` or `name( fixed("cat") )`
-#' - calls to the pseudo-function `vendor` that accept one symbol of
-#'   `apple`, `google`, `twitter`, `one`, `facebook`, `messenger`, `samsung`, `windows`
 #' - Any other call are just used verbatim in `filter`
 #'
 #' `ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter] on [jis]
@@ -126,7 +123,7 @@ ji_set <- function(...){
 #' @export
 print.jitsu <- function(x, ...){
   NextMethod()
-  cat_discreet( glue( "<emoji '{name}' selected from {n} matches >",
+  cat_discreet( glue( "<emoji '{name}' selected from {n} matches>",
     name = attr(x, "data")$name,
     n    = nrow(attr(x, "results"))
   ))
