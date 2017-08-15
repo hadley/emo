@@ -2,28 +2,23 @@
 % Please edit documentation in R/ji_glue.R
 \name{ji_glue}
 \alias{ji_glue}
-\title{emoji replacement}
+\title{emoji glue}
 \usage{
 ji_glue(txt)
 }
 \arguments{
 \item{txt}{character vector in which to replace `:something:` by an
-emoji for `something`, or `:something:*` by the collapsed
-list of all emojis relevant to `something`.}
+emoji for `something`. see [ji()] for what `something` can be.
+
+This is insipred from [glue::glue()] but uses `:` instead of braces
+because that's typically how emojis are
+[expressed](https://www.webpagefx.com/tools/emoji-cheat-sheet/)}
 }
 \description{
-emoji replacement
-}
-\details{
-- For the single form `:something:` [jitsu] is used on each pattern wrapped in `:`
-- For the list form `:something:*` [ji_set] is used
+emoji glue
 }
 \examples{
 \dontrun{
-  ji_glue( "My :cat,face,love: loves to :sleep,zzz:" )
-
-  ji_glue( ":monkey:* loves to :dance:" )
-
-  ji_glue( ":technologist:* do :cool: stuff")
+  ji_glue( ":cat:s love to :zzz:" )
 }
 }
