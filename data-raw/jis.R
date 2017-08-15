@@ -5,8 +5,25 @@ library(stringi)
 #' Parse Emoji List file
 parse_emoji_list <- function(
   emoji_list = "http://unicode.org/emoji/charts/emoji-list.html",
-  full_emoji_list = "http://unicode.org/emoji/charts/full-emoji-list.html"
+  full_emoji_list = "http://unicode.org/emoji/charts/full-emoji-list.html",
+  emoji_variants = "http://unicode.org/emoji/charts/emoji-variants.html"
 ) {
+
+  variants_tab <- read_html(emoji_variants) %>%
+    html_node("table") %>%
+    html_table() %>%
+    select(c(1,5)) %>%
+    as_tibble() %>%
+    set_names( c("code", "name" )) %>%
+    filter( ! str_detect(name, "[*]$") ) %>%
+    mutate(
+      runes = map( code, ~ c( paste0("U+", .), "U+FE0F") ),
+      name = str_to_lower(name),
+      emoji = runes %>% map( ~ strtoi(str_replace_all(., "^U[+]", ""), base = 16) ) %>%
+        stri_enc_fromutf32(),
+      category = "presentation",
+      subcategory = "presentation"
+    )
 
   # most of the information is in the first file
   html <- read_html(emoji_list)
@@ -66,6 +83,7 @@ parse_emoji_list <- function(
     bind_cols()
 
   jis <- bind_cols( jis, vendors )
+  jis <- bind_rows( jis, variants_tab )
   jis
 }
 
