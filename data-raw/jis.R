@@ -59,7 +59,9 @@ parse_emoji_list <- function(
       not()
   }
 
-  vendors <- c(apple=4, google=5,twitter=6, one=7, facebook = 8, messenger = 9, samsung=10, windows=11) %>%
+  vendors <- c(vendor_apple=4, vendor_google=5,vendor_twitter=6, vendor_one=7,
+    vendor_facebook = 8, vendor_messenger = 9, vendor_samsung=10, vendor_windows=11
+    ) %>%
     map( ~vendor(table, .) ) %>%
     bind_cols()
 
@@ -87,15 +89,10 @@ parse_gemoji <- function(){
   gemoji
 }
 
-jis <- parse_emoji_list()
-gemoji <- parse_gemoji()
-
-jis <- left_join( jis, gemoji, by = "emoji" )
-
-# merge tags and keywords
-jis <- jis %>%
-  mutate( keywords = map2(keywords, tags, ~unique( c(.x, .y))) ) %>%
-  select( -tags )
+merge_names <- function(x, y){
+  all_y <- y[ map_lgl(y, negate(is.null)) ] %>% flatten_chr
+  map2(x, y, ~unique( c(.x[ ! .x %in% all_y ], .y) ) )
+}
 
 alias_from_name <- function(name){
   name %>%
@@ -104,13 +101,21 @@ alias_from_name <- function(name){
     str_replace_all( "é", "e" ) %>%
     str_replace_all( "í", "i") %>%
     str_replace_all( "ô", "o") %>%
+    str_replace_all("[*]", "star") %>%
+    str_replace_all("[#]", "hash") %>%
+    str_replace_all("[&]", "and") %>%
     str_replace_all( "[^0-9a-zA-Z]", "_" ) %>%
     str_replace_all( "_+", "_")
 }
 
-jis <- jis %>%
-  mutate( aliases = map2( alias_from_name(name), aliases, ~unique( c(.x, .y))) )%>%
-  select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, apple:windows )
+jis_ <- parse_emoji_list()
+gemoji <- parse_gemoji()
+
+jis <- left_join( jis_, gemoji, by = "emoji" ) %>%
+  mutate( keywords = map2(keywords, tags, ~c(.x,.y) ) ) %>%
+  select( -tags ) %>%
+  mutate( aliases = merge_names( alias_from_name(name), aliases ) ) %>%
+  select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, starts_with("vendor") )
 
 use_data( jis, overwrite = TRUE)
 
