@@ -22,7 +22,8 @@ parse_emoji_list <- function(
       emoji = runes %>% map( ~ strtoi(str_replace_all(., "^U[+]", ""), base = 16) ) %>%
         stri_enc_fromutf32(),
       category = "presentation",
-      subcategory = "presentation"
+      subcategory = "presentation",
+      keywords = str_split( name, " " )
     )
 
   # most of the information is in the first file
@@ -141,14 +142,18 @@ emojilib <- read_json("data-raw/emojilib/emojis.json")
 keep <- emojilib %>% map( "char" ) %>% map_lgl(negate(is.null))
 emojilib <- emojilib[keep]
 emojilib_tbl <- tibble(
-  emojilibname = names(emojilib),
-  emoji = emojilib %>% map_chr( "char" )
-  ) %>%
-  filter( ! emojilibname %in% all_alias )
+    emoji = emojilib %>% map_chr( "char" ),
+    emojilibname = names(emojilib),
+    emojilibkeyword = emojilib %>% map("keywords") %>% map(. %>% flatten_chr())
+  )
 
 jis <- left_join( jis, emojilib_tbl, by = "emoji" ) %>%
-  mutate( aliases = map2(aliases, emojilibname, ~{ res <- c(.x, .y); res[!is.na(res)] } ) ) %>%
-  select(-emojilibname)
+  mutate(
+    aliases  = map2(aliases, emojilibname, ~{ res <- c(.x, setdiff(.y, all_alias) ); res[!is.na(res)] } ),
+    keywords = map2(keywords, emojilibkeyword, ~{ unique(c(.x, .y)) } )
+  ) %>%
+  select(-emojilibname, -emojilibkeyword)
+
 
 use_data( jis, overwrite = TRUE)
 
@@ -158,4 +163,14 @@ aliases <- jis %>%
 
 ji_name <- set_names(aliases$emoji, aliases$aliases )
 use_data( ji_name, overwrite = TRUE)
+
+kw <- select( jis, keywords, aliases ) %>%
+  filter( map_int(aliases, length) > 0 ) %>%
+  mutate( aliases = map_chr(aliases, 1)) %>%
+  unnest() %>%
+  group_by( keywords ) %>%
+  summarise( name = list(c(aliases)) )
+
+ji_keyword <- set_names( kw$name, kw$keywords )
+use_data( ji_keyword, overwrite = TRUE)
 

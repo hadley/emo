@@ -17,15 +17,15 @@ find_emoji <- function(keyword) {
   stopifnot(is.character(keyword), length(keyword) == 1)
 
   # First look in names
-  if (keyword %in% names(emoji_name)) {
-    return(emoji_name[[keyword]])
+  if (keyword %in% names(emo::ji_name)) {
+    return(emo::ji_name[[keyword]])
   }
 
-  if (keyword %in% names(emoji_keyword)) {
-    candidates <- emoji_keyword[[keyword]]
+  if (keyword %in% names(emo::ji_keyword)) {
+    candidates <- emo::ji_keyword[[keyword]]
     name <- sample(candidates, 1)
 
-    return(emoji_name[[name]])
+    return(emo::ji_name[[name]])
   }
 
   stop("Couldn't find emoji '", keyword, "'")
@@ -49,7 +49,7 @@ ji_find <- function(keyword) {
 
   tibble::tibble(
     name = names,
-    emoji = unname(emoji_name[names])
+    emoji = unname(emo::ji_name[names])
   )
 }
 

@@ -15,5 +15,8 @@
 #' - apple ... windows: logical indicating if the given vendor supports the emoji
 "jis"
 
-#' emoji aliases
+#' emoji names
 "ji_name"
+
+#' emoji keywords
+"ji_keyword"
