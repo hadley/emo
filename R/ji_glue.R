@@ -4,13 +4,7 @@ ji_glue_one <- function(txt){
   pos <- str_locate_all(txt, rx)[[1]]
 
   chunks <- str_extract_all(txt, rx)[[1]]
-
-  emojis <- map_chr(
-    chunks, ~{
-      name <- str_replace(., rx, "\\1")
-      if( name %in% names(emo::ji_alias) ) emo::ji_alias[name]
-    }
-  )
+  emojis <- map_chr( chunks, ~find_emoji( str_replace(., rx, "\\1") ) )
 
   for( i in rev(seq_along(emojis)) ){
     str_sub(txt, pos[i,1], pos[i,2]) <- emojis[i]
