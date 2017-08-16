@@ -4,6 +4,7 @@ Version: 0.0.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Romain", "François", , "romain@thinkr.fr", role = c("aut")), 
+    person("Lucy", "D'Agostino McGowan", email = "ld.mcgowan@vanderbilt.edu", role = c("aut"))
     person("RStudio", role = "cph")
   )
 Description: Makes it easy to insert 'emoji' based on either their name
