@@ -8,7 +8,7 @@ ji_glue(txt)
 }
 \arguments{
 \item{txt}{character vector in which to replace `:something:` by an
-emoji for `something`. see [ji()] for what `something` can be.
+emoji for `something`.
 
 This is insipred from [glue::glue()] but uses `:` instead of braces
 because that's typically how emojis are
@@ -19,6 +19,15 @@ emoji glue
 }
 \examples{
 \dontrun{
+  # simple syntax, uses `ji`
   ji_glue( ":cat:s love to :zzz:" )
+
+  # we can also use the `jitsu` syntax (with `~` and `,`)
+  ji_glue( ":~cat,face: love to :~sleep:" )
+
+  # and get sets of emojis instead of just one by
+  # using the wildcard suffix
+  ji_glue( ":monkey,face:* love to :celebrate:" )
+
 }
 }
