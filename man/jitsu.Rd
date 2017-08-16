@@ -4,7 +4,7 @@
 \alias{ji_filter}
 \alias{jitsu}
 \alias{ji_set}
-\title{extract an emoji}
+\title{find emoji}
 \usage{
 ji_filter(...)
 
@@ -16,18 +16,16 @@ ji_set(...)
 \item{`...`}{set of filters, see details}
 }
 \description{
-extract an emoji
+find emoji
 }
 \details{
 `...` can contain
-- bare symbols or strings, to be looked for in the name or the keywords. Understood as regular expressions.
-- calls to the pseudo-functions `name`, `category`, `subcategory`, `skin_tone`, `keyword`, `runes`. These accept regular expressions
-  to match the relevant column, e.g. `name("^cat")` or `name( fixed("cat") )`
-- calls to the pseudo-function `vendor` that accept one symbol of
-  `apple`, `google`, `twitter`, `one`, `facebook`, `messenger`, `samsung`, `windows`
+- bare symbols or strings, e.g. `cat` or `"cat"`. This will look for an exact word match in the name, the aliases or the keywords.
+- one sided formulas, e.g. `~cat`, `~"cat"`, `~regex("cat")`. The rhs of the formula is a regular expression
+  suitable for [stringr::regex()] matched against the name
 - Any other call are just used verbatim in `filter`
 
-`ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter] on [jis]
+`ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter()] on the [jis] tibble.
 
 `jitsu` selects one match at random between the results of `ji_filter`
 
@@ -36,21 +34,34 @@ extract an emoji
 \examples{
 \dontrun{
 
-# look in name and keywords with simple syntax
+# look these words in name, aliases and keywords
 jitsu(cat,face)
 jitsu(tears)
 jitsu(poop)
 jitsu(sad,cat)
 jitsu(monkey)
 
-# look only in specific columns
-jitsu(name("cat"))
-jitsu(skin_tone("^light"))
-jitsu(subcategory("person-role"), skin_tone("medium-dark"))
-jitsu(subcategory("face-fantasy") )
+# regex lookup
+jitsu(~cat)
+jitsu(~"^cat")
+jitsu(~regex("^cat"))
 
+# usual filter
+jitsu(name == "cat")
+jitsu(skin_tone == "light" )
+jitsu(subcategory == "person-role", skin_tone == "medium-dark" )
+jitsu(subcategory == "face-fantasy" )
+
+# get all the results in a new tibble
 ji_filter( monkey )
-ji_filter( cat, face )
+ji_filter( ~"^cat" )
+ji_filter(hand, skin_tone == "light" )
+
+# just get the emojis
+ji_set( monkey )
+ji_set( ~"^cat" )
+ji_set(hand, skin_tone == "medium-dark" )
+
 
 }
 

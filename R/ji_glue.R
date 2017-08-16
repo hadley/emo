@@ -1,4 +1,6 @@
 
+#' @importFrom stringr str_locate_all str_extract_all str_replace str_sub<-
+#' @importFrom purrr map_chr
 ji_glue_one <- function(txt){
   rx <- ":([a-zA-Z0-9_]*):"
   pos <- str_locate_all(txt, rx)[[1]]

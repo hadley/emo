@@ -1,47 +1,43 @@
 
 #' @importFrom purrr map_lgl
 #' @importFrom stringr str_detect
-#' @importFrom rlang quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang expr_name
-jitsu_simple_detect <- function(col, s){
-  col <- enquo(col)
+#' @importFrom rlang new_quosure is_formula quo quo_name enquo quo_expr is_symbol is_scalar_character is_unary_lang expr_name
+jitsu_words_lookup <- function(s){
   s <- enquo(s)
-  quo( str_detect( !!col, !!s) )
-}
+  wrx <- paste0( "\\b", quo_name(s), "\\b" )
 
-jitsu_multi_detect <- function(col, s){
-  col <- enquo(col)
-  s <- enquo(s)
-  quo( map_lgl( !!col, ~ any(str_detect( ., !!s))) )
-}
-
-jitsu_large_detect <- function(s){
-  s <- enquo(s)
   quo(
-    str_detect( name, !!quo_name(s) ) |
-    map_lgl( keywords, ~ any(str_detect( ., !!quo_name(s))) ) |
-    map_lgl( aliases , ~ any(str_detect( ., !!quo_name(s))) )
+    str_detect( name, !!wrx ) |
+    map_lgl( keywords, ~ any(. == !!quo_name(s)) ) |
+    map_lgl( aliases , ~ any(. == !!quo_name(s)) )
   )
 }
+
+jitsu_regex_lookup <- function(expr){
+  s <- new_quosure(expr[[2]])
+  if( is_symbol(quo_expr(s)) ){
+    s <- quo_name(s)
+  } else {
+    s <- quo_expr(s)
+  }
+
+  quo(
+    str_detect( name, !!s ) |
+    map_lgl( keywords, ~ any(str_detect(., !!s) ) ) |
+    map_lgl( aliases , ~ any(str_detect(., !!s) ) )
+  )
+}
+
 
 jitsu_filter_exprs <- function( q ){
   expr <- quo_expr(q)
 
   if( is_symbol(expr) ){
-    q <- jitsu_large_detect( !!quo_name(q) )
+    q <- jitsu_words_lookup( !!quo_name(q) )
   } else if( is_scalar_character(expr) ){
-    q <- jitsu_large_detect( !!q )
-  } else if( is_unary_lang(expr) ){
-    q <- switch( expr_name(expr[[1]]),
-      "name"        = jitsu_simple_detect( name    , !!expr[[2]] ),
-      "category"    = jitsu_simple_detect( category, !!expr[[2]] ),
-      "subcategory" = jitsu_simple_detect( subcategory, !!expr[[2]] ),
-      "skin_tone"   = jitsu_simple_detect( skin_tone, !!expr[[2]] ),
-
-      "keyword"     = jitsu_multi_detect( keywords, !!expr[[2]]),
-      "runes"       = jitsu_multi_detect( runes, !!expr[[2]]),
-
-      q
-    )
+    q <- jitsu_words_lookup( !!q )
+  } else if( is_formula(expr) && length(expr) == 2L ){
+    q <- jitsu_regex_lookup( expr )
   }
 
   q
@@ -54,7 +50,7 @@ ji_filter <- function( ... ){
   filter( emo::jis, !!!dots )
 }
 
-#' extract an emoji
+#' find emoji
 #'
 #' @rdname jitsu
 #' @param `...` set of filters, see details
@@ -62,12 +58,12 @@ ji_filter <- function( ... ){
 #' @details
 #'
 #' `...` can contain
-#' - bare symbols or strings, to be looked for in the name or the keywords. Understood as regular expressions.
-#' - calls to the pseudo-functions `name`, `category`, `subcategory`, `skin_tone`, `keyword`, `runes`. These accept regular expressions
-#'   to match the relevant column, e.g. `name("^cat")` or `name( fixed("cat") )`
+#' - bare symbols or strings, e.g. `cat` or `"cat"`. This will look for an exact word match in the name, the aliases or the keywords.
+#' - one sided formulas, e.g. `~cat`, `~"cat"`, `~regex("cat")`. The rhs of the formula is a regular expression
+#'   suitable for [stringr::regex()] matched against the name
 #' - Any other call are just used verbatim in `filter`
 #'
-#' `ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter] on [jis]
+#' `ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter()] on the [jis] tibble.
 #'
 #' `jitsu` selects one match at random between the results of `ji_filter`
 #'
@@ -76,21 +72,34 @@ ji_filter <- function( ... ){
 #' @examples
 #' \dontrun{
 #'
-#' # look in name and keywords with simple syntax
+#' # look these words in name, aliases and keywords
 #' jitsu(cat,face)
 #' jitsu(tears)
 #' jitsu(poop)
 #' jitsu(sad,cat)
 #' jitsu(monkey)
 #'
-#' # look only in specific columns
-#' jitsu(name("cat"))
-#' jitsu(skin_tone("^light"))
-#' jitsu(subcategory("person-role"), skin_tone("medium-dark"))
-#' jitsu(subcategory("face-fantasy") )
+#' # regex lookup
+#' jitsu(~cat)
+#' jitsu(~"^cat")
+#' jitsu(~regex("^cat"))
 #'
+#' # usual filter
+#' jitsu(name == "cat")
+#' jitsu(skin_tone == "light" )
+#' jitsu(subcategory == "person-role", skin_tone == "medium-dark" )
+#' jitsu(subcategory == "face-fantasy" )
+#'
+#' # get all the results in a new tibble
 #' ji_filter( monkey )
-#' ji_filter( cat, face )
+#' ji_filter( ~"^cat" )
+#' ji_filter(hand, skin_tone == "light" )
+#'
+#' # just get the emojis
+#' ji_set( monkey )
+#' ji_set( ~"^cat" )
+#' ji_set(hand, skin_tone == "medium-dark" )
+#'
 #'
 #' }
 #'
@@ -130,4 +139,4 @@ print.jitsu <- function(x, ...){
   invisible(x)
 }
 
-globalVariables( c("category", "keywords", "subcategory", "runes", "skin_tone") )
+globalVariables( c("category", "keywords", "subcategory", "runes", "skin_tone", "aliases") )
