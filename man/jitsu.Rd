@@ -13,7 +13,7 @@ jitsu(...)
 ji_set(...)
 }
 \arguments{
-\item{`...`}{set of filters, see details}
+\item{...}{set of filters, see details}
 }
 \description{
 find emoji

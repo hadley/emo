@@ -53,7 +53,7 @@ ji_filter <- function( ... ){
 #' find emoji
 #'
 #' @rdname jitsu
-#' @param `...` set of filters, see details
+#' @param ... set of filters, see details
 #'
 #' @details
 #'
