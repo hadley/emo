@@ -1,6 +1,7 @@
 library(tidyverse)
 library(rvest)
 library(stringi)
+library(jsonlite)
 
 #' Parse Emoji List file
 parse_emoji_list <- function(
@@ -69,6 +70,8 @@ parse_emoji_list <- function(
   # but then the other file can be used to identify vendor coverage
   table <- read_html(full_emoji_list) %>% html_node("table")
 
+  not <- function(x) !x
+
   vendor <- function(table, idx = 4){
     selector <- sprintf( "tr td:nth-child(%d)", idx )
     table %>%
@@ -98,7 +101,7 @@ parse_gemoji <- function(){
   gemoji <- tibble(
     emoji = map_chr(data, "emoji"),
     aliases = map(data, "aliases") %>% map( . %>% flatten_chr()),
-    tags = map(data, "tags") %>% map( . %>% flatten_chr()),
+    tags = map(data, "tags") %>% map( ~ if(is.list(.)) flatten_chr(.) else character() ),
     unicode_version = map_chr(data, "unicode_version"),
     ios_version = map_chr(data, "ios_version")
   ) %>%
@@ -110,7 +113,7 @@ parse_gemoji <- function(){
 
 merge_names <- function(x, y){
   all_y <- y[ map_lgl(y, negate(is.null)) ] %>% flatten_chr
-  map2(x, y, ~unique( c(.x[ ! .x %in% all_y ], .y) ) )
+  map2(x, y, ~unique( c(.y, .x[ ! .x %in% all_y ] ) ) )
 }
 
 alias_from_name <- function(name){
