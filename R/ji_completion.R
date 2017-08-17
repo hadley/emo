@@ -11,14 +11,14 @@ ji_completion <- function( token ){
   matches <- emo::ji_name[ str_detect(names(emo::ji_name), token ) ]
   matches <- matches[ !duplicated(matches) ]
   structure(
-    unique( paste0( matches, " :", names(matches), ":" ) ),
+    matches ,
     class = c("emoji_completion")
   )
 }
 
-#' @importFrom purrr walk
+#' @importFrom purrr walk2
 #' @export
 print.emoji_completion <- function(x, ...){
-  walk(x, writeLines )
+  writeLines( paste(x, " : ", names(x)) )
   invisible(x)
 }
