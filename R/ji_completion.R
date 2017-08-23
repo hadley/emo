@@ -24,31 +24,30 @@ print.emoji_completion <- function(x, ...){
 }
 
 emoji_completer <- function(env) {
-  if (completeme::inside_quotes(env) && grepl(":[^[:space:]]*:?$", env$token)) {
-    # The IDE does not tokenize the words like the console
-    token <- sub("[^:]*:", ":", env$token)
-
-    if (grepl("^:[^[:space:]]+:$", token)) {
-      emoji <- emo::ji(gsub(":", "", token))
-    } else {
-      res <- ji_completion(sub(":", "", token))
-
-      if (length(res) == 0) {
-        return(FALSE)
-      }
-
-      if (length(res) == 1) {
-        emoji <- emo::ji(names(res))
-      } else {
-        emoji <- paste0(res, " : ", names(res))
-      }
-    }
-    env$fileName <- emoji
-    env$comps <- emoji
-
-    return(TRUE)
+  if (!completeme::inside_quotes(env) || !grepl(":[^[:space:]]*:?$", env$token)) {
+    return()
   }
-  return(FALSE)
+
+  # The IDE does not tokenize the words like the console
+  token <- sub("[^:]*:", ":", env$token)
+
+  if (grepl("^:[^[:space:]]+:$", token)) {
+    emoji <- paste0(sub(":[^[:space:]]+:$", "", env$token), emo::ji(gsub(":", "", token)))
+  } else {
+    res <- ji_completion(sub(":", "", token))
+
+    if (length(res) == 0) {
+      return()
+    }
+
+    if (length(res) == 1) {
+      emoji <- emo::ji(names(res))
+    } else {
+      emoji <- paste0(res, " : ", names(res))
+    }
+  }
+
+  emoji
 }
 
 .onLoad <- function(pkg, lib) {
