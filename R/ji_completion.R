@@ -23,12 +23,14 @@ print.emoji_completion <- function(x, ...){
   invisible(x)
 }
 
+#' @importFrom completeme return_unless inside_quotes is_comment
 emoji_completer <- function(env) {
-  if (!completeme::inside_quotes(env) || !grepl(":[^[:space:]]*:?$", env$token)) {
-    return()
-  }
+  is_emoji_name <- function(x) grepl(":[^[:space:]]*:?$", x)
 
-  # The IDE does not tokenize the words like the console
+  return_unless((inside_quotes(env) || is_comment(env)) && is_emoji_name(env$token))
+
+  # The IDE does not tokenize the words like the readline console, so remove
+  # all but the last word
   token <- sub("[^:]*:", ":", env$token)
 
   if (grepl("^:[^[:space:]]+:$", token)) {
