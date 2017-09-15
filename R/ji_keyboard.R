@@ -7,54 +7,40 @@
 #' @export
 ji_keyboard <- function() {
 
+  emojiLink <- function(emoji, aliases){
+    link <- actionLink(emoji, label = emoji, `data-emoji` = aliases[1] )
+    link$attribs$class <- paste( link$attribs$class, "emoji-link")
+    link
+  }
+
   ui <- miniPage(
+    includeScript(system.file( "resources", "ji_keyboard.js", package = "emo")),
+    includeCSS(system.file( "resources", "ji_keyboard.css", package = "emo")),
 
     gadgetTitleBar("emojis"),
     miniContentPanel(
       textInput("emoji_query", "query", value = "cat", width = "100%" ),
       uiOutput("emoji_alias"),
       hr(),
-      uiOutput("emojis")
+      div( id = "emojis")
     )
   )
 
   server <- function(input, output, session) {
 
-    emojis_tbl <- reactive({
-      query <- str_replace_all( str_to_lower( input$emoji_query ), " ", ", " )
-      data  <- eval( parse( text = paste0( "emo::ji_filter( ", query , " )") ) )
-
-      filter( data, map_int(aliases, length) > 0 )
+    completions <- reactive({
+      ji_completion(input$emoji_query)
     })
 
-    aliases <- reactiveValues( data = NULL )
-
-    output$emojis <- renderUI({
-      data <- emojis_tbl()
-
-      rows <- map2( data$emoji, data$aliases,  ~ {
-
-        observeEvent( input[[.x]], {
-          aliases$data <- paste( ":", .y, ":", sep = "" )
-        })
-
-        actionLink( .x, label = .x, )
-      })
-
-      div(rows)
-
+    observe({
+      data <- completions()
+      session$sendCustomMessage( "emoji_refresh",
+        list( emojis = unname(data), aliases = names(data) )
+      )
     })
 
     output$emoji_alias <- renderUI({
-      div( map( aliases$data, div, style = "font-family: monospace" ) )
-    })
-
-    observeEvent(input$done, {
-      invisible(stopApp())
-    })
-
-    observeEvent(input$cancel, {
-      invisible(stopApp())
+      div( map( input$selected_aliases , div, style = "font-family: monospace" ) )
     })
 
   }
