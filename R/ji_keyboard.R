@@ -1,17 +1,17 @@
+
 #' emoji keyboard add in
 #'
 #' @import miniUI
 #' @import shiny
-#' @importFrom purrr pmap map_int map2
+#' @importFrom purrr pmap map_int map2 flatten_chr pluck
 #' @importFrom stringr str_replace_all str_to_lower
+#' @importFrom dplyr pull
 #' @export
 ji_keyboard <- function() {
 
-  emojiLink <- function(emoji, aliases){
-    link <- actionLink(emoji, label = emoji, `data-emoji` = aliases[1] )
-    link$attribs$class <- paste( link$attribs$class, "emoji-link")
-    link
-  }
+  context <- rstudioapi::getActiveDocumentContext()
+  selection <- pluck( context, "selection", 1, "text" ) %>%
+    str_replace_all(":", "")
 
   ui <- miniPage(
     includeScript(system.file( "resources", "ji_keyboard.js", package = "emo")),
@@ -19,10 +19,9 @@ ji_keyboard <- function() {
 
     gadgetTitleBar("emojis"),
     miniContentPanel(
-      textInput("emoji_query", "query", value = "cat", width = "100%" ),
-      uiOutput("emoji_alias"),
-      hr(),
-      div( id = "emojis")
+      textInput("emoji_query", "query", value = selection, width = "100%" ),
+      div( id = "emojis"),
+      uiOutput("emoji_alias")
     )
   )
 
@@ -40,9 +39,29 @@ ji_keyboard <- function() {
     })
 
     output$emoji_alias <- renderUI({
-      div( map( input$selected_aliases , div, style = "font-family: monospace" ) )
+      req(input$selected_emoji)
+      emo::jis %>%
+        filter( emoji == str_to_lower(input$selected_emoji) ) %>%
+        pull(aliases) %>%
+        flatten_chr() %>%
+        paste0( ":", ., ":") %>%
+        map( div, class = "alias" ) %>%
+        tagList()
     })
 
+    observeEvent(input$emoji_dblclicked, {
+      rstudioapi::insertText(input$emoji_dblclicked)
+      invisible(stopApp())
+    })
+
+    observeEvent(input$done, {
+      rstudioapi::insertText(input$selected_emoji)
+      invisible(stopApp())
+    })
+
+    observeEvent(input$cancel, {
+      invisible(stopApp())
+    })
   }
 
   viewer <- dialogViewer("Emoji Keyboard", width = 500, height = 500)
