@@ -151,7 +151,7 @@ gemoji <- parse_gemoji()
 jis_ <- parse_emoji_list()
 
 jis <- left_join( jis_, gemoji, by = "emoji" ) %>%
-  mutate( keywords = map2(keywords, tags, ~c(.x,.y) ) ) %>%
+  mutate( keywords = map2(keywords, tags, c ) ) %>%
   select( -tags ) %>%
   mutate( aliases = merge_names( alias_from_name(name), aliases ) ) %>%
   select( id:keywords, aliases, skin_tone:nrunes, unicode_version, ios_version, starts_with("vendor") )
@@ -159,7 +159,10 @@ jis <- left_join( jis_, gemoji, by = "emoji" ) %>%
 # get extra names from emojilib
 all_alias <- flatten_chr(jis$aliases)
 emojilib <- read_json("data-raw/emojilib/emojis.json")
-keep <- emojilib %>% map( "char" ) %>% map_lgl(negate(is.null))
+keep <- emojilib %>%
+  map( "char" ) %>%
+  map_lgl(negate(is.null))
+
 emojilib <- emojilib[keep]
 emojilib_tbl <- tibble(
     emoji = emojilib %>% map_chr( "char" ),
@@ -170,7 +173,7 @@ emojilib_tbl <- tibble(
 jis <- left_join( jis, emojilib_tbl, by = "emoji" ) %>%
   mutate(
     aliases  = map2(aliases, emojilibname, ~{ res <- c(.x, setdiff(.y, all_alias) ); res[!is.na(res)] } ),
-    keywords = map2(keywords, emojilibkeyword, ~{ unique(c(.x, .y)) } )
+    keywords = map2(keywords, emojilibkeyword, unique )
   ) %>%
   select(-emojilibname, -emojilibkeyword)
 
