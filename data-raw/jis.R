@@ -3,6 +3,7 @@ library(rvest)
 library(stringi)
 library(jsonlite)
 library(magrittr)
+library(devtools)
 
 #' Parse Emoji List file
 parse_emoji_list <- function(
