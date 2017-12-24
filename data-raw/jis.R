@@ -2,32 +2,38 @@ library(tidyverse)
 library(rvest)
 library(stringi)
 library(jsonlite)
+library(magrittr)
 
 #' Parse Emoji List file
 parse_emoji_list <- function(
-  emoji_list = "http://unicode.org/emoji/charts/emoji-list.html",
-  full_emoji_list = "http://unicode.org/emoji/charts/full-emoji-list.html",
-  emoji_variants = "http://unicode.org/emoji/charts/emoji-variants.html"
+  emoji_list = "http://unicode.org/emoji/charts-11.0/emoji-list.html",
+  full_emoji_list = "http://unicode.org/emoji/charts-11.0/full-emoji-list.html",
+  emoji_variants = "http://unicode.org/emoji/charts-11.0/emoji-variants.html"
 ) {
 
+  # Emoji Presentation sequences
+  #
+  # some of these are not included in the other files
+  # or with alternative representation
   variants_tab <- read_html(emoji_variants) %>%
     html_node("table") %>%
     html_table() %>%
-    select(c(1,5)) %>%
+    select(c(1L,5L)) %>%
     as_tibble() %>%
     set_names( c("code", "name" )) %>%
     filter( ! str_detect(name, "[*]$") ) %>%
     mutate(
       runes = map( code, ~ c( paste0("U+", .), "U+FE0F") ),
       name = str_to_lower(name),
-      emoji = runes %>% map( ~ strtoi(str_replace_all(., "^U[+]", ""), base = 16) ) %>%
+      emoji = runes %>%
+        map( ~ strtoi(str_replace_all(., "^U[+]", ""), base = 16) ) %>%
         stri_enc_fromutf32(),
       category = "presentation",
       subcategory = "presentation",
       keywords = str_split( name, " " )
     )
 
-  # most of the information is in the first file
+  # most of the information is in the first file: emoji-list.html
   html <- read_html(emoji_list)
   category <- html %>% html_nodes( "th.bighead" ) %>% html_text()
   subcategory <- html %>% html_nodes( "th.mediumhead" ) %>% html_text()
@@ -70,20 +76,29 @@ parse_emoji_list <- function(
   # but then the other file can be used to identify vendor coverage
   table <- read_html(full_emoji_list) %>% html_node("table")
 
-  not <- function(x) !x
+  tr <- table %>%
+    html_nodes( xpath = "//tr/td[@class='code']/.." )
+  sizes <- tr %>% map_int(xml_length)
 
-  vendor <- function(table, idx = 4){
-    selector <- sprintf( "tr td:nth-child(%d)", idx )
-    table %>%
+  vendor <- function(idx = 4){
+    selector <- sprintf( "td:nth-child(%d)", idx )
+    # not supported by default
+    # this civers the merged cells case when no vendor supports the emoji
+    out <- rep( FALSE, length(tr))
+
+    # when theree's info for all vendors, the emoji is supported if there's no
+    # miss in the node
+    out[ sizes == 15 ] <- tr[ sizes == 15 ] %>%
       html_nodes(selector) %>%
       str_detect("miss") %>%
       not()
+    out
   }
 
   vendors <- c(vendor_apple=4, vendor_google=5,vendor_twitter=6, vendor_one=7,
     vendor_facebook = 8, vendor_messenger = 9, vendor_samsung=10, vendor_windows=11
     ) %>%
-    map( ~vendor(table, .) ) %>%
+    map( vendor ) %>%
     bind_cols()
 
   jis <- bind_cols( jis, vendors )
@@ -130,8 +145,10 @@ alias_from_name <- function(name){
     str_replace_all( "_+", "_")
 }
 
-jis_ <- parse_emoji_list()
+
 gemoji <- parse_gemoji()
+
+jis_ <- parse_emoji_list()
 
 jis <- left_join( jis_, gemoji, by = "emoji" ) %>%
   mutate( keywords = map2(keywords, tags, ~c(.x,.y) ) ) %>%
