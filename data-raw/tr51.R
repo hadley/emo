@@ -1,5 +1,6 @@
 library(tidyverse)
 library(glue)
+library(assertthat)
 
 parse_emoji_data <- function(file = "data-raw/unicode-tr51/data/emoji-data.txt"){
   read_lines( file) %>%
@@ -68,6 +69,16 @@ rx_modifier <- emoji_data %>%
   { paste0("[", .[1], "-", .[2], "]") }
 
 rx_modifier_sequence <- paste0( modifier_base, rx_modifier )
+
+
+rx_sequences <- glue("{rx_modifier_sequence}|{rx_flags}|{rx_keycap}")
+
+
+
+
+
+
+
 
 # dealing with kiss, family and couple separately
 rx_adult <- "[\U1F468\U1F469]"
