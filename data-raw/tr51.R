@@ -1,6 +1,7 @@
 library(tidyverse)
 library(glue)
 library(assertthat)
+library(stringi)
 
 parse_emoji_data <- function(file = "data-raw/unicode-tr51/data/emoji-data.txt"){
   read_lines( file) %>%
@@ -55,7 +56,7 @@ rx_emoji <- emoji_data_no_presentation %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" ) %>%
-  paste0( "(?:", ., ")(?!\UFE0E)\UFE0F?" ) %>%
+  paste0( "(?:", ., ")\UFE0F" ) %>%
   str_replace("[*]", "[*]")
 
 
@@ -69,7 +70,7 @@ rx_picto <- emoji_data_picto %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" ) %>%
-  paste0( "(?:", ., ")(?!\UFE0E)\UFE0F?" )
+  paste0( "(?:", ., ")\UFE0F" )
 
 
 #### emoji sequences
