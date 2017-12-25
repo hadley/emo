@@ -2,57 +2,29 @@ library(tidyverse)
 library(glue)
 
 parse_emoji_data <- function(file = "data-raw/unicode-tr51/data/emoji-data.txt"){
-  explode_code <- function(code){
-    map( str_split(code, "[.]{2}") , ~{
-      if( length(.) == 1) {
-        strtoi(., base = 16)
-      } else {
-        x <- strtoi(., base = 16)
-        seq( x[1], x[2] )
-      }
-    })
-  }
-
   read_lines( file) %>%
     str_subset( "^[0-9A-F]" ) %>%
     tibble( txt = .) %>%
     separate(txt, into = c("code", "type_field"), sep = "[;#]", extra = "drop" )%>%
     mutate_all(str_trim) %>%
-    mutate(points = explode_code(code)) %>%
-    group_by(type_field) %>%
-    summarise( points = list(flatten_int(points)) )
-
+    mutate( points = map( str_split(code, "[.]{2}"), strtoi, base = 16) ) %>%
+    group_by(type_field)
 }
 
 parse_emoji_sequence <- function(file ){
   read_lines(file) %>%
     str_subset( "^[0-9A-F]" ) %>%
     tibble( txt = .) %>%
-    separate(txt, into = c("code", "type_field"), sep = "[;#]", extra = "drop" )%>%
+    separate(txt, into = c("code", "type_field", "description"), sep = "[;#]", extra = "drop" )%>%
     mutate_all(str_trim) %>%
     mutate(
       points = map( str_split(code, " "), strtoi, base = 16 ),
       nrunes = map_int(points, length)
     ) %>%
-    arrange( desc(nrunes) )
-
+    arrange( desc(nrunes), code )
 }
 
 emoji_data <- parse_emoji_data()
-
-
-
-# emoji_sequences <- bind_rows(
-#   parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-sequences.txt"),
-#   parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-zwj-sequences.txt")
-# ) %>%
-#   mutate( nrunes = map_int(points, length)) %>%
-#   arrange( desc(nrunes) )
-#
-# sequences_rx <- stri_enc_fromutf32( emoji_sequences$points ) %>%
-#   str_replace( "[*]", "[*]") %>%
-#  paste( collapse = "|" )
-
 
 emoji_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-sequences.txt")
 
@@ -63,5 +35,53 @@ rx_keycap <- emoji_sequences %>%
   stri_enc_fromutf32() %>%
   paste0("[", ., "]\uFE0F\u20E3")
 
-rx_flags <- "[\U1F1E6-\U1F1FF]{2}"
+# this can probably be simplified as there are some common runes
+rx_subregion_flag <- emoji_sequences %>%
+  filter(type_field == "Emoji_Tag_Sequence" ) %>%
+  pull(points) %>%
+  stri_enc_fromutf32() %>%
+  paste0( collapse = "|")
+
+rx_flags <- paste0( "[\U1F1E6-\U1F1FF]{2}|", rx_subregion_flag )
+
+code_point_range <- function(x){
+  if( length(x) == 1 ){
+    stri_enc_fromutf32(x)
+  } else {
+    unicode <- map(x, stri_enc_fromutf32)
+    paste0( "[", unicode[1], "-", unicode[2], "]" )
+  }
+}
+modifier_base <- emoji_data %>%
+  filter( type_field == "Emoji_Modifier_Base" ) %>%
+  pull(points) %>%
+  map_chr( code_point_range ) %>%
+  paste0( collapse = "|" ) %>%
+  paste0( "(?:", ., ")")
+
+rx_modifier <- emoji_data %>%
+  filter( type_field == "Emoji_Modifier" ) %>%
+  pull(points) %>%
+  extract2(1L) %>%
+  map_chr(stri_enc_fromutf32 ) %>%
+  { paste0("[", .[1], "-", .[2], "]") }
+
+rx_modifier_sequence <- paste0( modifier_base, rx_modifier )
+
+# dealing with kiss, family and couple separately
+rx_adult <- "[\U1F468\U1F469]"
+rx_kid   <- "[\U1F466\U1F467]"
+
+rx_couple_sequence <- glue("{rx_adult}\U200D\U2764\UFE0F\U200D{rx_adult}")
+rx_kiss_sequence   <- glue("{rx_adult}\U200D\U2764\UFE0F\U200D\U1F48B\U200D{rx_adult}" )
+rx_family_sequence <- glue("(?:{rx_adult}\u200D){{1,2}}(?:{rx_kid}\u200D?){{1,2}}")
+
+# gendered roles ...
+emoji_zwj_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-zwj-sequences.txt") %>%
+  filter( !str_detect(description, "^(kiss|couple|family)") )
+
+
+
+
+
 
