@@ -55,7 +55,8 @@ rx_emoji <- emoji_data_no_presentation %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" ) %>%
-  paste0( "(?:", ., ")\UFE0F?" )
+  paste0( "(?:", ., ")(?!\UFE0E)\UFE0F?" ) %>%
+  str_replace("[*]", "[*]")
 
 
 emoji_data_picto <- anti_join(
@@ -68,7 +69,7 @@ rx_picto <- emoji_data_picto %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" ) %>%
-  paste0( "(?:", ., ")\UFE0F?" )
+  paste0( "(?:", ., ")(?!\UFE0E)\UFE0F?" )
 
 
 #### emoji sequences
@@ -176,7 +177,7 @@ assert_that( nrow(filter( emoji_zwj_sequences, !str_detect(emoji, rx_zwj_seq))) 
 
 ####### final rx
 
-ji_rx <- glue("{rx_zwj_seq}|{rx_sequences}|{rx_presentation}|{rx_emoji}|{rx_picto}")
+ji_rx <- unclass(glue("{rx_zwj_seq}|{rx_sequences}|{rx_presentation}|{rx_emoji}|{rx_picto}"))
 
-use_data( ji_rx, overwrite = TRUE )
+devtools::use_data( ji_rx, overwrite = TRUE )
 
