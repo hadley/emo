@@ -19,7 +19,8 @@ parse_emoji_sequence <- function(file ){
     mutate_all(str_trim) %>%
     mutate(
       points = map( str_split(code, " "), strtoi, base = 16 ),
-      nrunes = map_int(points, length)
+      nrunes = map_int(points, length),
+      emoji = stri_enc_fromutf32(points)
     ) %>%
     arrange( desc(nrunes), code )
 }
@@ -71,17 +72,60 @@ rx_modifier_sequence <- paste0( modifier_base, rx_modifier )
 # dealing with kiss, family and couple separately
 rx_adult <- "[\U1F468\U1F469]"
 rx_kid   <- "[\U1F466\U1F467]"
+zwj      <- "\u200D"
+
+woman_sign <- "\u2640"
+man_sign <- "\u2642"
+rx_gender <- glue("[{woman_sign}{man_sign}]\uFE0F")
 
 rx_couple_sequence <- glue("{rx_adult}\U200D\U2764\UFE0F\U200D{rx_adult}")
 rx_kiss_sequence   <- glue("{rx_adult}\U200D\U2764\UFE0F\U200D\U1F48B\U200D{rx_adult}" )
 rx_family_sequence <- glue("(?:{rx_adult}\u200D){{1,2}}(?:{rx_kid}\u200D?){{1,2}}")
 
 # gendered roles ...
-emoji_zwj_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-zwj-sequences.txt") %>%
-  filter( !str_detect(description, "^(kiss|couple|family)") )
+emoji_zwj_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-zwj-sequences.txt")
+# %>%
+#  filter( !str_detect(description, "^(kiss|couple|family)") )
 
+# sequences that are coded in 3 runes
+roles_zwj_3 <- emoji_zwj_sequences %>% filter( nrunes == 3, str_detect(description, "^woman") ) %>% pull( points ) %>% map_int(3L)
+rx_zwj_3 <- glue( "{rx_adult}{rx_modifier}?{zwj}[{roles}]",
+  roles = stri_enc_fromutf32(roles_zwj_3)
+)
 
+# those coded in 4 runes - with the gender first
+roles_zwj_4_1 <- emoji_zwj_sequences %>%
+  filter( nrunes == 4, str_detect(description,"^woman"), !str_detect(description, ":"), str_detect(code, "^1F469") ) %>%
+  pull(points) %>%
+  map_int(3)
+rx_zwj_4_1 <- glue( "{rx_adult}{rx_modifier}?{zwj}[{roles}]\uFE0F",
+  roles = stri_enc_fromutf32(roles_zwj_4_1)
+)
 
+# those coded in 4 runes - with in 3rd position
+roles_zwj_4_2 <- emoji_zwj_sequences %>%
+  filter( nrunes == 4, str_detect(description,"^(blond-haired )?(mer|wo)m[ae]n"), !str_detect(description, ":"), !str_detect(code, "^1F469") ) %>%
+  pull(points) %>%
+  map_int(1)
+rx_zwj_4_2 <- glue( "[{roles}]{rx_modifier}?{zwj}{rx_gender}",
+  roles = stri_enc_fromutf32(roles_zwj_4_2)
+)
 
+rx_rainbow_flag <- filter( emoji_zwj_sequences, description == "rainbow flag" ) %>%
+  pull(points) %>%
+  stri_enc_fromutf32()
 
+roles_zwj_5 <- emoji_zwj_sequences %>%
+  filter( nrunes == 5, !str_detect(description, ":"), str_detect(description, "woman") ) %>%
+  pull(points) %>%
+  map_int(1)
+rx_zwj_5 <- glue( "[{roles}](?:\uFE0F|{rx_modifier}){zwj}{rx_gender}",
+  roles = stri_enc_fromutf32(roles_zwj_5)
+)
+
+rx_eye <- filter( emoji_zwj_sequences, description == "eye in speech bubble" ) %>%
+  pull(points) %>%
+  stri_enc_fromutf32()
+
+rx_zwj_seq <- glue("{rx_couple_sequence}|{rx_kiss_sequence}|{rx_family_sequence}|{rx_zwj_3}|{rx_zwj_4_1}|{rx_zwj_4_2}|{rx_rainbow_flag}|{rx_zwj_5}|{rx_eye}")
 
