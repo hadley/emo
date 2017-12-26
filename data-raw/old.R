@@ -1,3 +1,6 @@
+
+# old implementation - use the emoji11.R file instead
+
 library(tidyverse)
 library(rvest)
 library(stringi)
@@ -46,13 +49,13 @@ parse_emoji_list <- function(
   jis <- table %>%
     set_names( c("id", "runes", "sample", "name", "keywords") ) %>%
     select(-sample) %>%
-      # lines not needed
+    # lines not needed
     filter( runes != "Code" ) %>%
-      # expand category
+    # expand category
     mutate( category = case_when( id %in% category ~ id, TRUE ~  NA_character_ ) ) %>%
     fill( category ) %>%
     filter( id != category ) %>%
-      # expand sub category
+    # expand sub category
     mutate( subcategory = case_when( id %in% subcategory ~ id, TRUE ~  NA_character_ ) ) %>%
     fill( subcategory ) %>%
     filter( id != subcategory ) %>%
@@ -98,7 +101,7 @@ parse_emoji_list <- function(
 
   vendors <- c(vendor_apple=4, vendor_google=5,vendor_twitter=6, vendor_one=7,
     vendor_facebook = 8, vendor_messenger = 9, vendor_samsung=10, vendor_windows=11
-    ) %>%
+  ) %>%
     map( vendor ) %>%
     bind_cols()
 
@@ -166,10 +169,10 @@ keep <- emojilib %>%
 
 emojilib <- emojilib[keep]
 emojilib_tbl <- tibble(
-    emoji = emojilib %>% map_chr( "char" ),
-    emojilibname = names(emojilib),
-    emojilibkeyword = emojilib %>% map("keywords") %>% map(. %>% flatten_chr())
-  )
+  emoji = emojilib %>% map_chr( "char" ),
+  emojilibname = names(emojilib),
+  emojilibkeyword = emojilib %>% map("keywords") %>% map(. %>% flatten_chr())
+)
 
 jis <- left_join( jis, emojilib_tbl, by = "emoji" ) %>%
   mutate(
@@ -203,3 +206,35 @@ kw <- bind_rows( kw, tibble(keywords = aliases, name = as.list(aliases) ) )
 ji_keyword <- set_names( kw$name, kw$keywords )
 use_data( ji_keyword, overwrite = TRUE)
 
+
+
+
+# Emoji Presentation sequences
+#
+# some of these are not included in the other files
+# or with alternative representation
+variants_information <- function(){
+
+  if( !file.exists( "data-raw/emoji11/emoji-variants.html" ) ){
+    download.file("https://www.unicode.org/emoji/charts-11.0/emoji-variants.html", destfile = "data-raw/emoji11/emoji-variants.html" )
+  }
+
+  variants_tab <- read_html("data-raw/emoji11/emoji-variants.html") %>%
+    html_node("table") %>%
+    html_table() %>%
+    select(c(1L,5L)) %>%
+    as_tibble() %>%
+    set_names( c("code", "name" )) %>%
+    filter( ! str_detect(name, "[*]$") ) %>%
+    mutate(
+      runes = map( code, ~ c( paste0("U+", .), "U+FE0F") ),
+      name = str_to_lower(name),
+      emoji = runes %>%
+        map( ~ strtoi(str_replace_all(., "^U[+]", ""), base = 16) ) %>%
+        stri_enc_fromutf32(),
+      category = "presentation",
+      subcategory = "presentation",
+      keywords = str_split( name, " " )
+    )
+
+}
