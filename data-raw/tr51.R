@@ -112,7 +112,7 @@ rx_modifier <- emoji_data %>%
 
 rx_modifier_sequence <- glue( "{modifier_base}\UFE0F?{rx_modifier}?" )
 
-rx_sequences <- glue("{rx_modifier_sequence}|{rx_flags}|{rx_keycap}")
+rx_sequences <- glue("(?#\n\n--------simple sequences with skin tone modifiers--------){rx_modifier_sequence}|(?#\n\n--------country flags--------){rx_flags}|(?#\n\n--------keycap sequences--------){rx_keycap}")
 
 assert_that( nrow(filter( emoji_sequences, !str_detect(emoji, rx_sequences))) == 0 )
 
@@ -179,14 +179,11 @@ rx_pirate_flag <- filter( emoji_zwj_sequences, description == "pirate flag" ) %>
   pull(points) %>%
   stri_enc_fromutf32()
 
-rx_zwj_seq <- glue("{rx_couple_sequence}|{rx_kiss_sequence}|{rx_family_sequence}|{rx_zwj_3}|{rx_zwj_4_1}|{rx_zwj_4_2}|{rx_rainbow_flag}|{rx_zwj_5}|{rx_eye}|{rx_pirate_flag}")
-
+rx_zwj_seq <- glue("(?#\n\n--------couple with heart--------\n){rx_couple_sequence}|(?#\n\n--------kiss--------\n){rx_kiss_sequence}|(?#\n\n--------family--------\n){rx_family_sequence}|(?#\n\n--------gendered roles--------\n){rx_zwj_3}|{rx_zwj_4_1}|(?#\n\n--------gendered activities--------\n){rx_zwj_4_2}|{rx_zwj_5}|(?#\n\n--------other zwj sequences--------){rx_rainbow_flag}|{rx_eye}|{rx_pirate_flag}")
 assert_that( nrow(filter( emoji_zwj_sequences, !str_detect(emoji, rx_zwj_seq))) == 0 )
-
-
 ####### final rx
-
-ji_rx <- unclass(glue("{rx_zwj_seq}|{rx_sequences}|{rx_presentation}|{rx_emoji}|{rx_picto}"))
+ji_rx <- unclass(glue("{rx_zwj_seq}|{rx_sequences}|(?#\n\n--------Emoji_Presentation--------){rx_presentation}|(?#\n\n--------Emoji--------){rx_emoji}|(?#\n\n--------Extended_Pictographic--------){rx_picto}"))
+cat( ji_rx )
 
 devtools::use_data( ji_rx, overwrite = TRUE )
 
