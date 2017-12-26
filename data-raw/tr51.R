@@ -3,7 +3,7 @@ library(glue)
 library(assertthat)
 library(stringi)
 
-parse_emoji_data <- function(file = "data-raw/unicode-tr51/data/emoji-data.txt"){
+parse_emoji_data <- function(file = "data-raw/tr51/emoji-data.txt"){
   read_lines( file) %>%
     str_subset( "^[0-9A-F]" ) %>%
     tibble( txt = .) %>%
@@ -74,7 +74,7 @@ rx_picto <- emoji_data_picto %>%
 
 
 #### emoji sequences
-emoji_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-sequences.txt")
+emoji_sequences <- parse_emoji_sequence("data-raw/tr51/emoji-sequences.txt")
 
 rx_keycap <- emoji_sequences %>%
   filter( type_field == "Emoji_Keycap_Sequence" ) %>%
@@ -129,7 +129,7 @@ rx_kiss_sequence   <- glue("{rx_adult}\U200D\U2764\UFE0F\U200D\U1F48B\U200D{rx_a
 rx_family_sequence <- glue("(?:{rx_adult}\u200D){{1,2}}(?:{rx_kid}\u200D?){{1,2}}")
 
 # gendered roles ...
-emoji_zwj_sequences <- parse_emoji_sequence("data-raw/unicode-tr51/data/emoji-zwj-sequences.txt")
+emoji_zwj_sequences <- parse_emoji_sequence("data-raw/tr51/emoji-zwj-sequences.txt")
 
 # sequences that are coded in 3 runes
 roles_zwj_3 <- emoji_zwj_sequences %>% filter( nrunes == 3, str_detect(description, "^woman") ) %>% pull( points ) %>% map_int(3L)
@@ -171,7 +171,11 @@ rx_eye <- filter( emoji_zwj_sequences, description == "eye in speech bubble" ) %
   pull(points) %>%
   stri_enc_fromutf32()
 
-rx_zwj_seq <- glue("{rx_couple_sequence}|{rx_kiss_sequence}|{rx_family_sequence}|{rx_zwj_3}|{rx_zwj_4_1}|{rx_zwj_4_2}|{rx_rainbow_flag}|{rx_zwj_5}|{rx_eye}")
+rx_pirate_flag <- filter( emoji_zwj_sequences, description == "pirate flag" ) %>%
+  pull(points) %>%
+  stri_enc_fromutf32()
+
+rx_zwj_seq <- glue("{rx_couple_sequence}|{rx_kiss_sequence}|{rx_family_sequence}|{rx_zwj_3}|{rx_zwj_4_1}|{rx_zwj_4_2}|{rx_rainbow_flag}|{rx_zwj_5}|{rx_eye}|{rx_pirate_flag}")
 
 assert_that( nrow(filter( emoji_zwj_sequences, !str_detect(emoji, rx_zwj_seq))) == 0 )
 
