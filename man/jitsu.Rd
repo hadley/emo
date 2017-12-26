@@ -49,8 +49,7 @@ jitsu(~regex("^cat"))
 # usual filter
 jitsu(name == "cat")
 jitsu(skin_tone == "light" )
-jitsu(subcategory == "person-role", skin_tone == "medium-dark" )
-jitsu(subcategory == "face-fantasy" )
+jitsu(subgroup == "face-fantasy" )
 
 # get all the results in a new tibble
 ji_filter( monkey )

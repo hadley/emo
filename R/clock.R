@@ -19,7 +19,7 @@ clock <- function(time){
   x <- round( 1 + 2*hour %% 12 + minute / 30 ) %% 24
 
   data <- emo::jis %>%
-    filter( subcategory == "time", str_detect(name, "(o\\u2019clock|thirty)") ) %>%
+    filter( subgroup == "time", str_detect(name, "(o\\u2019clock|thirty)") ) %>%
     slice(x)
 
   structure( data$emoji, time = time, data = data,  class = c("clock", "emoji" ) )

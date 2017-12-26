@@ -87,8 +87,7 @@ ji_filter <- function( ... ){
 #' # usual filter
 #' jitsu(name == "cat")
 #' jitsu(skin_tone == "light" )
-#' jitsu(subcategory == "person-role", skin_tone == "medium-dark" )
-#' jitsu(subcategory == "face-fantasy" )
+#' jitsu(subgroup == "face-fantasy" )
 #'
 #' # get all the results in a new tibble
 #' ji_filter( monkey )
@@ -139,4 +138,4 @@ print.jitsu <- function(x, ...){
   invisible(x)
 }
 
-globalVariables( c("category", "keywords", "subcategory", "runes", "skin_tone", "aliases") )
+globalVariables( c("group", "keywords", "subgroup", "runes", "aliases") )

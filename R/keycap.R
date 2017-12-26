@@ -23,7 +23,7 @@ keycap <- function( x ){
   assert_that( x %in% choices )
 
   idx <- which( x == choices )
-  data <- filter( emo::jis, subcategory == "keycap" ) %>%
+  data <- filter( emo::jis, subgroup == "keycap" ) %>%
     slice(idx)
 
   structure(

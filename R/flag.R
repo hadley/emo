@@ -13,7 +13,7 @@
 #' # name of all the flags
 #' if( require(dplyr) ){
 #'  emo::jis %>%
-#'    filter( category == "Flags" ) %>%
+#'    filter( group == "Flags" ) %>%
 #'    pull(name)
 #' }
 #'
@@ -24,7 +24,7 @@
 #' @importFrom glue glue
 #' @export
 flag <- function( pattern ){
-  data <- filter( emo::jis, category == "Flags", str_detect(name, pattern) )
+  data <- filter( emo::jis, group == "Flags", str_detect(name, pattern) )
   n <- nrow(data)
   if( n == 0 ){
     stop( glue( "Cannot find flag '{pattern}' ") )
@@ -51,5 +51,5 @@ print.flag <- function(x, ... ){
 }
 
 #' @importFrom utils globalVariables
-globalVariables( c("category", "name") )
+globalVariables( c("group", "name") )
 

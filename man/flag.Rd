@@ -24,7 +24,7 @@ flag( "New Zealand" )
 # name of all the flags
 if( require(dplyr) ){
  emo::jis \%>\%
-   filter( category == "Flags" ) \%>\%
+   filter( group == "Flags" ) \%>\%
    pull(name)
 }
 
