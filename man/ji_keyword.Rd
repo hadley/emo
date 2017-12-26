@@ -4,7 +4,7 @@
 \name{ji_keyword}
 \alias{ji_keyword}
 \title{emoji keywords}
-\format{An object of class \code{list} of length 6025.}
+\format{An object of class \code{list} of length 5608.}
 \usage{
 ji_keyword
 }
