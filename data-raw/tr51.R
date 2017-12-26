@@ -9,8 +9,7 @@ parse_emoji_data <- function(file = "data-raw/tr51/emoji-data.txt"){
     tibble( txt = .) %>%
     separate(txt, into = c("code", "type_field", "description"), sep = "[;#]", extra = "drop" )%>%
     mutate_all(str_trim) %>%
-    mutate( points = map( str_split(code, "[.]{2}"), strtoi, base = 16) ) %>%
-    group_by(type_field)
+    mutate( points = map( str_split(code, "[.]{2}"), strtoi, base = 16) )
 }
 
 parse_emoji_sequence <- function(file ){
@@ -38,11 +37,17 @@ code_point_range <- function(x){
 
 
 emoji_data <- parse_emoji_data()
+data_modifier_base <- emoji_data %>%
+  filter( type_field == "Emoji_Modifier_Base" )
 
 # emoji presentation
 
-rx_presentation <- emoji_data %>%
+# emoji presentation not possibly affected by skin tone modifiers
+data_presentation <- emoji_data %>%
   filter( type_field == "Emoji_Presentation" ) %>%
+  anti_join( select(data_modifier_base, code), by = "code" )
+
+rx_presentation <- data_presentation %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" )
@@ -51,7 +56,9 @@ emoji_data_no_presentation <- anti_join(
   filter( emoji_data, type_field == "Emoji"),
   filter( emoji_data, type_field == "Emoji_Presentation"),
   by = "code"
-)
+) %>%
+  anti_join( select(data_modifier_base, code), by = "code" )
+
 rx_emoji <- emoji_data_no_presentation %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
@@ -59,13 +66,11 @@ rx_emoji <- emoji_data_no_presentation %>%
   paste0( "(?:", ., ")\UFE0F" ) %>%
   str_replace("[*]", "[*]")
 
-
 emoji_data_picto <- anti_join(
   filter( emoji_data, type_field == "Extended_Pictographic"),
   filter( emoji_data, type_field == "Emoji"),
   by = "code"
 )
-
 rx_picto <- emoji_data_picto %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
@@ -92,8 +97,7 @@ rx_subregion_flag <- emoji_sequences %>%
 
 rx_flags <- paste0( "[\U1F1E6-\U1F1FF]{2}|", rx_subregion_flag )
 
-modifier_base <- emoji_data %>%
-  filter( type_field == "Emoji_Modifier_Base" ) %>%
+modifier_base <- data_modifier_base %>%
   pull(points) %>%
   map_chr( code_point_range ) %>%
   paste0( collapse = "|" ) %>%
@@ -106,7 +110,7 @@ rx_modifier <- emoji_data %>%
   map_chr(stri_enc_fromutf32 ) %>%
   { paste0("[", .[1], "-", .[2], "]") }
 
-rx_modifier_sequence <- paste0( modifier_base, rx_modifier )
+rx_modifier_sequence <- glue( "{modifier_base}\UFE0F?{rx_modifier}?" )
 
 rx_sequences <- glue("{rx_modifier_sequence}|{rx_flags}|{rx_keycap}")
 
