@@ -8,27 +8,27 @@ jitsu_words_lookup <- function(s){
 
   quo(
     str_detect( name, !!wrx ) |
-    map_lgl( keywords, ~ any(. == !!quo_name(s)) ) |
-    map_lgl( aliases , ~ any(. == !!quo_name(s)) )
+    map_lgl( aliases , ~ any(str_detect(., !!wrx)) )
   )
 }
 
-jitsu_regex_lookup <- function(expr){
-  s <- new_quosure(expr[[2]])
-  if( is_symbol(quo_expr(s)) ){
-    s <- quo_name(s)
+jitsu_regex_lookup <- function(q){
+  q <- enquo(q)
+  q <- new_quosure( quo_expr(q)[[2]], get_env(q) )
+
+  s <- if( is_symbol(quo_expr(q)) ){
+    quo_name(q)
   } else {
-    s <- quo_expr(s)
+    quo_expr(q)
   }
 
   quo(
     str_detect( name, !!s ) |
-    map_lgl( keywords, ~ any(str_detect(., !!s) ) ) |
     map_lgl( aliases , ~ any(str_detect(., !!s) ) )
   )
 }
 
-
+#' @importFrom rlang enquo
 jitsu_filter_exprs <- function( q ){
   expr <- quo_expr(q)
 
@@ -37,17 +37,22 @@ jitsu_filter_exprs <- function( q ){
   } else if( is_scalar_character(expr) ){
     q <- jitsu_words_lookup( !!q )
   } else if( is_formula(expr) && length(expr) == 2L ){
-    q <- jitsu_regex_lookup( expr )
+    q <- jitsu_regex_lookup( !!q )
   }
 
   q
 }
 
+#' @rdname
+#' @export
+jitsu_quos <- function(...){
+  map( quos(...), jitsu_filter_exprs )
+}
+
 #' @rdname jitsu
 #' @export
-ji_filter <- function( ... ){
-  dots <- map( quos(...), jitsu_filter_exprs )
-  filter( emo::jis, !!!dots )
+jitsu_filter <- function( ... ){
+  filter( emo::jis, !!!jitsu_quos(...) )
 }
 
 #' find emoji
@@ -63,11 +68,11 @@ ji_filter <- function( ... ){
 #'   suitable for [stringr::regex()] matched against the name
 #' - Any other call are just used verbatim in `filter`
 #'
-#' `ji_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter()] on the [jis] tibble.
+#' `jitsu_filter` reworks the `...` as above and eventually returns the results of [dplyr::filter()] on the [jis] tibble.
 #'
-#' `jitsu` selects one match at random between the results of `ji_filter`
+#' `jitsu` selects one match at random between the results of `jitsu_filter`
 #'
-#' `ji_set` makes a vector of all the selected emojis
+#' `jitsu_set` makes a vector of all the selected emojis
 #'
 #' @examples
 #' \dontrun{
@@ -90,14 +95,14 @@ ji_filter <- function( ... ){
 #' jitsu(subgroup == "face-fantasy" )
 #'
 #' # get all the results in a new tibble
-#' ji_filter( monkey )
-#' ji_filter( ~"^cat" )
-#' ji_filter(hand, skin_tone == "light" )
+#' jitsu_filter( monkey )
+#' jitsu_filter( ~"^cat" )
+#' jitsu_filter(hand, skin_tone == "light" )
 #'
 #' # just get the emojis
-#' ji_set( monkey )
-#' ji_set( ~"^cat" )
-#' ji_set(hand, skin_tone == "medium-dark" )
+#' jitsu_set( monkey )
+#' jitsu_set( ~"^cat" )
+#' jitsu_set(hand, skin_tone == "medium-dark" )
 #'
 #'
 #' }
@@ -107,7 +112,7 @@ ji_filter <- function( ... ){
 #' @importFrom purrr map
 #' @export
 jitsu <- function( ... ){
-  results <- ji_filter(...)
+  results <- jitsu_filter(...)
   data    <- sample_n(results, 1 )
 
   structure( data$emoji,
@@ -120,13 +125,12 @@ jitsu <- function( ... ){
 
 #' @rdname jitsu
 #' @export
-ji_set <- function(...){
+jitsu_set <- function(...){
   structure(
-    c( ji_filter(...)$emoji ),
+    c( jitsu_filter(...)$emoji ),
     class = "emoji"
   )
 }
-
 
 #' @export
 print.jitsu <- function(x, ...){
