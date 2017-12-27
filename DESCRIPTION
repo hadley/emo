@@ -26,7 +26,8 @@ Imports:
     rlang,
     purrr,
     miniUI,
-    shiny
+    shiny,
+    rstudioapi
 RoxygenNote: 6.0.1.9000
 URL: https://github.com/hadley/emo
 BugReports: https://github.com/hadley/emo/issues

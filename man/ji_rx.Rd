@@ -4,7 +4,7 @@
 \name{ji_rx}
 \alias{ji_rx}
 \title{A regular expression to catch all emojis}
-\format{An object of class \code{character} of length 1.}
+\format{character vector}
 \usage{
 ji_rx
 }

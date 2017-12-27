@@ -12,6 +12,7 @@ jitsu_words_lookup <- function(s){
   )
 }
 
+#' @importFrom rlang get_env
 jitsu_regex_lookup <- function(q){
   q <- enquo(q)
   q <- new_quosure( quo_expr(q)[[2]], get_env(q) )
@@ -43,7 +44,7 @@ jitsu_filter_exprs <- function( q ){
   q
 }
 
-#' @rdname
+#' @rdname jitsu
 #' @export
 jitsu_quos <- function(...){
   map( quos(...), jitsu_filter_exprs )
