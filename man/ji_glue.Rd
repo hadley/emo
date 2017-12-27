@@ -27,7 +27,7 @@ emoji glue
 
   # and get sets of emojis instead of just one by
   # using the wildcard suffix
-  ji_glue( ":monkey,face:* love to :celebrate:" )
+  ji_glue( ":monkey,face: love to :celebrate:" )
 
 }
 }

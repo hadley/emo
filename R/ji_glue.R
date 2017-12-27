@@ -1,11 +1,13 @@
-
-#' @importFrom glue collapse
+#' @importFrom glue collapse evaluate
 emoji_transformer <- function(code, envir) {
-  if (grepl("[*]$", code)) {
-    code <- sub("[*]$", "", code)
-    collapse(ji_find(code)$emoji)
+  has_dollar <- grepl("[*]$", code)
+  if( has_dollar ) code <- sub("[*]$", "", code)
+  res <- evaluate( glue( "jitsu_set({code})" ), envir )
+
+  if (has_dollar) {
+    collapse(res)
   } else {
-    ji(code)
+    sample(res, 1)
   }
 }
 
@@ -28,7 +30,7 @@ emoji_transformer <- function(code, envir) {
 #'
 #'   # and get sets of emojis instead of just one by
 #'   # using the wildcard suffix
-#'   ji_glue( ":monkey,face:* love to :celebrate:" )
+#'   ji_glue( ":monkey,face: love to :party:" )
 #'
 #' }
 #' @importFrom glue glue
