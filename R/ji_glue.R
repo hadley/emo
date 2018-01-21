@@ -2,7 +2,7 @@
 emoji_transformer <- function(code, envir) {
   has_dollar <- grepl("[*]$", code)
   if( has_dollar ) code <- sub("[*]$", "", code)
-  res <- evaluate( glue( "jitsu_set({code})" ), envir )
+  res <- evaluate( glue( "emo::jitsu_set({code})" ), envir )
 
   if (has_dollar) {
     collapse(res)
