@@ -9,7 +9,7 @@ library(glue)
 
 download_emoji11 <- function(){
   if (!file.exists( "data-raw/emoji11" )) dir.create("data-raw/emoji11")
-  download.file("https://www.unicode.org/emoji/charts-11.0/full-emoji-list.html", destfile = "data-raw/emoji11/full-emoji-list" )
+  download.file("https://www.unicode.org/emoji/charts-11.0/full-emoji-list.html", destfile = "data-raw/emoji11/full-emoji-list.html" )
   download.file("https://www.unicode.org/emoji/charts-11.0/emoji-list.html", destfile = "data-raw/emoji11/emoji-list.html" )
 }
 
@@ -60,9 +60,7 @@ data1 <- left_join( test, ordering, by = "emoji" ) %>%
   mutate(
     points = map( str_split(runes, " "), strtoi, base = 16),
     nrunes = map_int(points, length)
-  ) %>%
-  filter( qualified == "fully-qualified") %>%
-  select( -qualified )
+  )
 
 # fetch vendor information from full-emoji-list.html
 
