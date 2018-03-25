@@ -14,13 +14,17 @@ update_emoji11 <- function(){
 }
 
 download_tr51 <- function(){
-  files <- c("emoji-data.txt", "emoji-ordering.txt", "emoji-data.txt", "emoji-sequences.txt", "emoji-zwj-sequences.txt")
+  if (!file.exists( "data-raw/tr51" )) dir.create("data-raw/tr51")
+  download.file("https://www.unicode.org/emoji/charts/emoji-ordering.txt", "data-raw/tr51/emoji-ordering.txt")
+
+  files <- c("emoji-data.txt", "emoji-sequences.txt", "emoji-zwj-sequences.txt")
   walk(files, ~{
-    download.file(
-      glue("https://www.unicode.org/Public/emoji//11.0/{.x}"),
-      destfile = glue("data-raw/tr51/{.x}")
-    )
+    url <- glue("https://www.unicode.org/Public/emoji/11.0/{file}", file = .x)
+    dest <- glue("data-raw/tr51/{file}", file = .x)
+    print(url)
+    download.file(url, destfile = dest)
   })
+
 }
 
 
