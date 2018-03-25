@@ -4,6 +4,3 @@
 [submodule "data-raw/emojilib"]
 	path = data-raw/emojilib
 	url = https://github.com/muan/emojilib.git
-[submodule "data-raw/emoji-regex"]
-	path = data-raw/emoji-regex
-	url = https://github.com/mathiasbynens/emoji-regex.git
