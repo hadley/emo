@@ -5,12 +5,24 @@ library(rvest)
 library(xml2)
 library(jsonlite)
 library(devtools)
+library(glue)
 
 update_emoji11 <- function(){
   if (!file.exists( "data-raw/emoji11" )) dir.create("data-raw/emoji11")
   download.file("https://www.unicode.org/emoji/charts-11.0/full-emoji-list.html", destfile = "data-raw/emoji11/full-emoji-list" )
   download.file("https://www.unicode.org/emoji/charts-11.0/emoji-list.html", destfile = "data-raw/emoji11/emoji-list.html" )
 }
+
+download_tr51 <- function(){
+  files <- c("emoji-data.txt", "emoji-ordering.txt", "emoji-data.txt", "emoji-sequences.txt", "emoji-zwj-sequences.txt")
+  walk(files, ~{
+    download.file(
+      glue("https://www.unicode.org/Public/emoji//11.0/{.x}"),
+      destfile = glue("data-raw/tr51/{.x}")
+    )
+  })
+}
+
 
 test <- read_lines("data-raw/tr51/emoji-test.txt") %>%
   str_subset( "^(# (sub)?group:|[^#].*;.*#.*)" ) %>%
