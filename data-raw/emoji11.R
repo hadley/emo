@@ -6,6 +6,12 @@ library(xml2)
 library(jsonlite)
 library(devtools)
 
+update_emoji11 <- function(){
+  if (!file.exists( "data-raw/emoji11" )) dir.create("data-raw/emoji11")
+  download.file("https://www.unicode.org/emoji/charts-11.0/full-emoji-list.html", destfile = "data-raw/emoji11/full-emoji-list" )
+  download.file("https://www.unicode.org/emoji/charts-11.0/emoji-list.html", destfile = "data-raw/emoji11/emoji-list.html" )
+}
+
 test <- read_lines("data-raw/tr51/emoji-test.txt") %>%
   str_subset( "^(# (sub)?group:|[^#].*;.*#.*)" ) %>%
   tibble( txt = .) %>%
@@ -44,9 +50,6 @@ data1 <- left_join( test, ordering, by = "emoji" ) %>%
 # fetch vendor information from full-emoji-list.html
 
 vendor_information <- function(){
-  if( !file.exists( "data-raw/emoji11/full-emoji-list.html" ) ){
-    download.file("https://www.unicode.org/emoji/charts-11.0/full-emoji-list.html", destfile = "data-raw/emoji11/full-emoji-list" )
-  }
   table <- read_html("data-raw/emoji11/full-emoji-list.html") %>%
     html_node("table")
 
@@ -94,10 +97,6 @@ data2 <- left_join( data1, vendors, by = "emoji" )
 
 #### extract keywords from emoji-list.html
 keywords_information <- function(){
-  if( !file.exists( "data-raw/emoji11/emoji-list.html" ) ){
-    download.file("https://www.unicode.org/emoji/charts-11.0/emoji-list.html", destfile = "data-raw/emoji11/emoji-list.html" )
-  }
-
   html <- read_html("data-raw/emoji11/emoji-list.html")
   category <- html %>% html_nodes( "th.bighead" ) %>% html_text()
   subcategory <- html %>% html_nodes( "th.mediumhead" ) %>% html_text()
