@@ -1,11 +1,11 @@
-#' @importFrom glue collapse evaluate
+#' @importFrom glue glue_collapse
 emoji_transformer <- function(code, envir) {
   has_dollar <- grepl("[*]$", code)
   if( has_dollar ) code <- sub("[*]$", "", code)
-  res <- evaluate( glue( "emo::jitsu_set({code})" ), envir )
+  res <- eval( parse( glue( "emo::jitsu_set({code})" ), keep.source = FALSE ), envir )
 
   if (has_dollar) {
-    collapse(res)
+    glue_collapse(res)
   } else {
     sample(res, 1)
   }
