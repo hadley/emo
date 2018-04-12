@@ -16,7 +16,7 @@ LazyData: true
 Imports:
     stringr,
     dplyr,
-    glue,
+    glue (>= 1.2.0.9000),
     crayon,
     utils,
     magrittr,
