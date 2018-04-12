@@ -1,47 +1,32 @@
-#' @importFrom glue collapse evaluate
-emoji_transformer <- function(code, envir) {
-  has_dollar <- grepl("[*]$", code)
-  if( has_dollar ) code <- sub("[*]$", "", code)
-  res <- evaluate( glue( "emo::jitsu_set({code})" ), envir )
-
-  if (has_dollar) {
-    collapse(res)
+#' @importFrom glue glue_collapse
+emoji_transformer <- function(text, envir) {
+  has_star <- grepl("[*]$", text)
+  if (has_star) {
+    text <- sub("[*]$", "", text)
+    glue_collapse(ji_find(text)$emoji)
   } else {
-    sample(res, 1)
+    ji(text)
   }
 }
 
 #' emoji glue
 #'
-#' @param txt character vector in which to replace `:something:` by an
-#' emoji for `something`.
+#' @param \dots strings to format, where `:x:` is replaced by an emoji for "x", using [ji()] and `:y*:` is replaced by all
+#' emojis that match "y", using [ji_find()].
+#' @param .envir see [glue::glue()]
 #'
-#' This is insipred from [glue::glue()] but uses `:` instead of braces
-#' because that's typically how emojis are
-#' [expressed](https://www.webpagefx.com/tools/emoji-cheat-sheet/)
+#' @seealso [glue::glue()] for how the strings are concatenated
 #'
 #' @examples
 #' \dontrun{
-#'   # simple syntax, uses `ji`
-#'   ji_glue( ":cat:s love to :zzz:" )
-#'
-#'   # we can also use the `jitsu` syntax (with `~` and `,`)
-#'   ji_glue( ":~cat,face: love to :~sleep:" )
-#'
-#'   # and get sets of emojis instead of just one by
-#'   # using the wildcard suffix
-#'   ji_glue( ":monkey,face: love to :party:" )
-#'
+#'   ji_glue("one :heart:")
+#'   ji_glue("many :heart*:")
 #' }
 #' @importFrom glue glue
 #' @importFrom purrr map_chr
 #' @export
-ji_glue <- function(txt){
-  .envir <- parent.frame()
-  structure(
-    map_chr(txt, ~glue(., .open = ":", .close = ":", .envir = .envir, .transformer = emoji_transformer)),
-    class = "emoji"
-  )
+ji_glue <- function(..., .envir=parent.frame()){
+  glue(..., .open = ":", .close = ":", .envir = .envir, .transformer = emoji_transformer)
 }
 
 
