@@ -22,8 +22,6 @@
 #' diamond( "small", "orange")
 #' }
 #'
-#' @importFrom dplyr filter
-#' @importFrom magrittr %>%
 #' @importFrom glue glue
 #'
 #' @export
@@ -31,11 +29,11 @@ square <- function(size = c( "small", "medium", "medium-small", "large" ), color
   size <- match.arg(size)
   color <- match.arg(color)
 
-  data <- emo::jis %>%
-    filter( name == glue("{color} {size} square") )
+  jis <- emo::jis
+  emoji <- jis$emoji[ jis$name == glue("{color} {size} square") ]
 
   structure(
-    data$emoji,
+    emoji,
     class = c("square", "geometric", "emoji"),
     size = size,
     color = color
@@ -54,8 +52,8 @@ diamond <- function( size = c("large", "small"), color = c("orange", "blue") ){
   size <- match.arg(size)
   color <- match.arg(color)
 
-  data <- emo::jis %>%
-    filter( name == glue("{size} {color} diamond") )
+  jis <- emo::jis
+  emoji <- jis$emoji[ jis$name == glue("{size} {color} diamond") ]
 
   structure(
     data$emoji,
