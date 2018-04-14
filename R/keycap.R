@@ -13,8 +13,6 @@
 #' }
 #'
 #' @importFrom assertthat assert_that
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter slice
 #' @export
 keycap <- function( x ){
   choices <- c("#", "*", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -22,12 +20,11 @@ keycap <- function( x ){
   assert_that( length(x) == 1)
   assert_that( x %in% choices )
 
-  idx <- which( x == choices )
-  data <- filter( emo::jis, subgroup == "keycap" ) %>%
-    slice(idx)
+  jis <- emo::jis
+  emoji <- jis$emoji[ jis$subgroup == "keycap" & jis$qualified == "fully-qualified" ][ x == choices]
 
   structure(
-    data$emoji,
+    emoji,
     char = x,
     class = c("keycap", "emoji")
   )

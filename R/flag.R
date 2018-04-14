@@ -20,11 +20,10 @@
 #' }
 #'
 #' @importFrom stringr str_detect
-#' @importFrom dplyr filter
 #' @importFrom glue glue
 #' @export
 flag <- function( pattern ){
-  data <- filter( emo::jis, group == "Flags", str_detect(name, pattern) )
+  data <- emo::jis[ emo::jis$group == "Flags" & str_detect(emo::jis$name, pattern), ]
   n <- nrow(data)
   if( n == 0 ){
     stop( glue( "Cannot find flag '{pattern}' ") )

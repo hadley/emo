@@ -43,12 +43,10 @@ moon <- function( date, day = day_in_synodic_cycle(date) ){
   assert_that( day >= 0 & day <= synodic_month )
 
   idx <- 1 + (day / synodic_month * 8) %% 8
-
-  data <- emo::jis %>%
-    filter( str_detect( name, "moon$" ) ) %>%
-    slice(idx)
-
-  structure( data$emoji,
+  jis <- emo::jis
+  data <- jis[ which(str_detect( jis$name, "moon$" ))[idx],  ]
+  structure(
+    data$emoji,
     class = c("moon", "emoji"),
     day = day,
     data = data

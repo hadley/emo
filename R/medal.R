@@ -28,9 +28,7 @@ medal <- function( position ){
   names <- c("1st place medal", "2nd place medal", "3rd place medal")
 
   pos <- eval_tidy( position, data = aliases )
-
-  data <- emo::jis %>%
-    filter( name == names[pos] )
+  data <- emo::jis[ emo::jis$name == names[pos], ]
 
   structure( data$emoji,
     class = c("medal", "emoji"),

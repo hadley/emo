@@ -15,7 +15,6 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     stringr,
-    dplyr,
     glue (>= 1.2.0.9000),
     crayon,
     utils,
@@ -27,5 +26,7 @@ Imports:
 RoxygenNote: 6.0.1.9000
 URL: https://github.com/hadley/emo
 BugReports: https://github.com/hadley/emo/issues
-Suggests: testthat
+Suggests: 
+    testthat,
+    dplyr
 Remotes: tidyverse/glue
