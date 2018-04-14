@@ -9,7 +9,6 @@
 #' clock( Sys.time() )
 #' }
 #'
-#' @importFrom dplyr filter
 #' @importFrom stringr str_detect
 #' @export
 clock <- function(time){
@@ -18,10 +17,10 @@ clock <- function(time){
 
   x <- round( 1 + 2*hour %% 12 + minute / 30 ) %% 24
 
-  data <- emo::jis %>%
-    filter( subgroup == "time", str_detect(name, "(o\\u2019clock|thirty)") ) %>%
-    slice(x)
+  jis <- emo::jis
+  idx <- which( jis$subgroup == "time" & str_detect(jis$name, "(o\\u2019clock|thirty)") )
 
+  data <- jis[ idx[x], ]
   structure( data$emoji, time = time, data = data,  class = c("clock", "emoji" ) )
 
 }
