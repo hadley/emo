@@ -1,0 +1,4 @@
+Name: Insert emoji
+Description: Select emojis to insert.
+Binding: ji_selector
+Interactive: true
