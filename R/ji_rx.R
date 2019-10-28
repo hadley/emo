@@ -88,7 +88,7 @@ ji_replace <- function( string, replacement) str_replace(string, emo::ji_rx, rep
 #' @export
 ji_replace_all <- function(string, replacement) str_replace_all(string, emo::ji_rx, replacement)
 
-#' Lodate the positio of emojis in a string
+#' Locate the position of emojis in a string
 #'
 #' Vectorised over `string`
 #'
