@@ -56,7 +56,7 @@ diamond <- function( size = c("large", "small"), color = c("orange", "blue") ){
   emoji <- jis$emoji[ jis$name == glue("{size} {color} diamond") ]
 
   structure(
-    data$emoji,
+    emoji,
     class = c("diamond", "geometric", "emoji"),
     size = size,
     color = color
