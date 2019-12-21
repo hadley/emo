@@ -44,6 +44,12 @@ emo::ji("face")
 emo::ji("face")
 ```
 
+You can use keywords with emo::ji_find to find the unique name for an emoji.
+
+```{r}
+emo::ji_find("sun")
+```
+
 Often you'll use inline like `r '\u60\u60 \u60r emo::ji("smile")\u60 \u60\u60'` `r emo::ji("smile")`
 
 ## Keywords
